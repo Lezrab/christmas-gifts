@@ -1,0 +1,68 @@
+.landing-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+
+/* Base des carrés */
+.card {
+  aspect-ratio: 1 / 1;
+  background: white;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Style spécifique profil */
+.profile {
+  background: #fdfdfd;
+}
+
+.initial {
+  width: 60px;
+  height: 60px;
+  background: #d42426; /* Rouge Noël */
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/* Style bouton ajouter */
+.add-card {
+  border: 2px dashed #bbb;
+  background: transparent;
+  color: #888;
+}
+
+.icon-plus {
+  font-size: 40px;
+  margin-bottom: 5px;
+}
+
+.name {
+  font-weight: 500;
+  color: #333;
+}

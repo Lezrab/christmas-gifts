@@ -1,0 +1,20 @@
+<div class="landing-container">
+  <header>
+    <h1>La Hotte de la Famille</h1>
+    <p>Sélectionnez un profil pour voir sa liste</p>
+  </header>
+
+  <div class="grid-container">
+    @for (member of familyMembers(); track member.id) {
+      <div class="card profile" (click)="goToMember(member.id)">
+        <div class="initial">{{ member.name.charAt(0) }}</div>
+        <span class="name">{{ member.name }}</span>
+      </div>
+    }
+
+    <div class="card add-card" (click)="openAddModal()">
+      <div class="icon-plus">+</div>
+      <span class="name">Ajouter</span>
+    </div>
+  </div>
+</div>
