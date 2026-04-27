@@ -1,0 +1,365 @@
+/* --- LAYOUT PRINCIPAL --- */
+.list-container {
+  max-width: 1300px; /* Légèrement augmenté pour accommoder 4 colonnes confortablement */
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.list-header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* --- GRILLE (4 COLONNES) --- */
+.gift-grid {
+  display: grid;
+  /* On utilise auto-fill avec un min de 250px pour forcer les 4 colonnes sur desktop */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* --- CARTES CADEAUX --- */
+.gift-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Important pour l'alignement sur une même ligne */
+  min-height: 420px; /* Augmenté pour inclure l'image proprement */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.gift-card:hover {
+  border-color: #d42426;
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(212, 36, 38, 0.15);
+}
+
+/* --- IMAGES PREVIEW --- */
+.gift-image-preview {
+  width: calc(100% + 50px);
+  margin: -25px -25px 20px -25px;
+  height: 180px;
+  background: #fdfdfd;
+  border-bottom: 1px solid #eee;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gift-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 'contain' pour ne pas couper les produits, 'cover' pour remplir */
+  padding: 10px;
+  transition: transform 0.5s ease;
+}
+
+.gift-card:hover .gift-image-preview img {
+  transform: scale(1.08);
+}
+
+/* --- ACTIONS (EDIT/DELETE) --- */
+.card-actions {
+  position: absolute;
+  top: 15px;      /* Distance par rapport au haut */
+  left: 15px;     /* On force l'alignement à gauche */
+  right: auto;    /* On annule un éventuel alignement à droite */
+  display: flex;
+  flex-direction: column; /* On les empile verticalement pour gagner de la place en largeur */
+  gap: 8px;
+  z-index: 10;    /* Pour qu'ils soient toujours cliquables au-dessus de l'image */
+}
+
+/* --- TEXTES ET INFOS --- */
+.gift-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Pousse le footer vers le bas */
+}
+
+.gift-card h3 {
+  color: #d42426;
+  font-family: 'Mountains of Christmas', cursive; /* Si installée */
+  font-size: 1.3rem;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.description {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- BADGES ET PRIX --- */
+.price-tag {
+  background: #095228;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  align-self: flex-start;
+  margin-bottom: 10px;
+}
+
+/* --- FOOTER ET BOUTONS --- */
+.gift-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.gift-link {
+  color: #095228;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.btn-reserve {
+  background: #d42426;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* --- CARTE "AJOUTER" --- */
+.add-gift-card {
+  border: 3px dashed #d42426;
+  background: rgba(255, 255, 255, 0.4);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.add-gift-card .icon-plus {
+  font-size: 50px;
+  color: #d42426;
+  margin-bottom: 10px;
+}
+
+/* --- BOUTON RETOUR --- */
+.btn-back {
+  align-self: flex-start;
+  background: white;
+  color: #095228;
+  border: 2px solid #095228;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  background: #095228;
+  color: white;
+  transform: translateX(-5px);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 1100px) {
+  .gift-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); } /* 3 colonnes */
+}
+
+@media (max-width: 850px) {
+  .gift-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); } /* 2 colonnes */
+}
+
+@media (max-width: 550px) {
+  .gift-grid { grid-template-columns: 1fr; } /* 1 colonne */
+  .list-header h1 { font-size: 1.8rem; }
+}
+
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  left: 40px; /* Décalé pour laisser la place à l'autre bouton */
+  background: rgba(255, 255, 255, 0.8); /* Fond clair pour voir sur l'image */
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  font-size: 18px;
+  z-index: 20; /* Force le passage au-dessus de l'image */
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  position: absolute;
+  top: 10px;
+  left: 8px; /* Collé à gauche */
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  font-size: 18px;
+  z-index: 20; /* Force le passage au-dessus de l'image */
+  transition: all 0.2s;
+}
+
+.edit-btn:hover {
+  background: #095228; /* Vert Noël au survol */
+  color: white;
+  transform: scale(1.1);
+}
+
+.delete-btn:hover {
+  background: #d42426; /* Rouge Noël au survol */
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Style de la boîte de dialogue (modale) */
+.modal {
+  border: none;
+  border-radius: 25px;
+  padding: 0;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: white;
+  overflow: hidden;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+/* Contenu intérieur */
+.modal-content {
+  padding: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-content h2 {
+  font-family: 'Mountains of Christmas', cursive; /* Ta police festive */
+  color: #d42426;
+  margin: 0 0 10px 0;
+  text-align: center;
+  font-size: 2rem;
+}
+
+/* Groupes de formulaires pour éviter les chevauchements */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* Champs de saisie */
+.form-group input,
+.form-group textarea {
+  padding: 12px 15px;
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fdfdfd;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #095228; /* Vert sapin au focus */
+  background: white;
+  box-shadow: 0 0 0 4px rgba(9, 82, 40, 0.1);
+}
+
+/* Actions en bas */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Boutons stylisés Noël */
+.btn-save, .btn-cancel {
+  padding: 12px 20px;
+  border-radius: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  border: none;
+}
+
+.btn-save {
+  background: #095228;
+  color: white;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #0b6631;
+  transform: scale(1.05);
+}
+
+.btn-save:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background: #f8f8f8;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.btn-cancel:hover {
+  background: #eee;
+  color: #d42426;
+}

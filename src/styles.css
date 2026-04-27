@@ -13,6 +13,36 @@ body {
   margin: 0;
 }
 
+body::before {
+  content: "❄ ❅ ❆ ❄ ❆ ❅ ❄ ❅ ❆";
+  position: fixed;
+  top: -10vh;
+  left: 0;
+  width: 100%;
+  height: 110vh;
+  pointer-events: none;
+  z-index: 1;
+  /* Création d'une grille de flocons avec des tailles variées */
+  font-size: 24px;
+  color: white;
+  opacity: 0.6;
+  white-space: pre-wrap;
+  word-spacing: 150px;
+  line-height: 200px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+  /* Animation de chute */
+  animation: snow-fall 12s linear infinite;
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(100vh) rotate(20deg); /* Légère rotation en tombant */
+  }
+}
+
 h1, h2, h3 {
   font-family: var(--font-title);
   color: #d42426; /* Rouge Noël */

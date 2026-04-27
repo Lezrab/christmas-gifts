@@ -1,0 +1,91 @@
+<div class="list-container">
+  <header class="list-header">
+    <button class="btn-back" (click)="goBack()">
+      <span class="arrow">←</span> Retour
+    </button>
+    <h1>La hotte de {{ memberName() }} 🎄</h1>
+  </header>
+
+  <div class="gift-grid">
+    <div class="gift-card add-gift-card" (click)="openGiftModal()">
+      <div class="icon-plus">+</div>
+      <span class="add-text">Ajouter une idée</span>
+    </div>
+
+    @for (gift of gifts(); track gift.id) {
+      <div class="gift-card">
+
+        <div class="gift-image-preview">
+          @if (gift.image_url) {
+            <img [src]="gift.image_url" alt="Aperçu du cadeau">
+          } @else {
+            <div class="no-image">🎁</div>
+          }
+        </div>
+
+        <div class="card-actions">
+          <button class="edit-btn" (click)="editGift($event, gift)">&#8942;</button>
+          <button class="delete-btn" (click)="deleteGift($event, gift.id)">&times;</button>
+        </div>
+
+        <div class="gift-info">
+          @if (gift.price) {
+            <span class="price-tag">{{ gift.price }}€</span>
+          }
+          <h3>{{ gift.title }}</h3>
+          <p>{{ gift.comment }}</p>
+        </div>
+
+        <div class="card-footer">
+          @if (gift.url) {
+            <a [href]="gift.url" target="_blank" class="gift-link">Voir le produit →</a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<dialog #giftModal class="modal" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <h2>Nouvelle Idée Cadeau 🎁</h2>
+
+    <div class="form-group">
+      <label>Nom du cadeau</label>
+      <input type="text" [(ngModel)]="newGift.title" placeholder="Ex: Gants en laine">
+    </div>
+
+    <div class="form-group">
+      <label>Description / Détails</label>
+      <textarea [(ngModel)]="newGift.comment" placeholder="Taille, couleur, précisions..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Prix estimé (€)</label>
+      <input type="number" [(ngModel)]="newGift.price" placeholder="0.00">
+    </div>
+
+    <div class="form-group">
+      <label>Lien internet (URL)</label>
+      <input
+        type="url"
+        [(ngModel)]="newGift.url"
+        (blur)="onUrlPaste()"
+        placeholder="https://...">
+    </div>
+
+    @if (newGift.image_url) {
+      <div class="preview-container">
+        <img [src]="newGift.image_url" class="mini-preview">
+        <p>Image trouvée ! ✨</p>
+      </div>
+    }
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeGiftModal()">Annuler</button>
+      <button class="btn-save" (click)="saveGift()">
+        Ajouter à la hotte
+      </button>
+    </div>
+  </div>
+</dialog>
