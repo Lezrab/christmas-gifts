@@ -7,7 +7,21 @@
   <div class="grid-container">
     @for (member of familyMembers(); track member.id) {
       <div class="card profile" (click)="goToMember(member.id)">
-        <div class="initial">{{ member.name.charAt(0) }}</div>
+        <button class="edit-btn" (click)="editMember($event, member)">
+          &#8942;
+        </button>
+        <button class="delete-btn" (click)="deleteMember($event, member.id)">
+          &times;
+        </button>
+
+        <div class="avatar-container">
+          @if (member.avatar_url) {
+            <img [src]="member.avatar_url" class="profile-img" alt="Avatar">
+          } @else {
+            <div class="initial">{{ member.name.charAt(0) }}</div>
+          }
+        </div>
+
         <span class="name">{{ member.name }}</span>
       </div>
     }
@@ -18,3 +32,29 @@
     </div>
   </div>
 </div>
+
+<dialog #profileModal class="modal">
+  <div class="modal-content">
+    <h2>Modifier le Profil</h2>
+
+    <div class="form-group">
+      <label>Prénom</label>
+      <input type="text" [(ngModel)]="selectedMember.name" placeholder="Nom du membre">
+    </div>
+
+    <div class="form-group">
+      <label>Photo de profil</label>
+      <div class="file-upload">
+        @if (selectedMember.avatar_url) {
+          <img [src]="selectedMember.avatar_url" class="preview-img">
+        }
+        <input type="file" (change)="onFileSelected($event)" accept="image/*">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="saveProfile()">Enregistrer</button>
+    </div>
+  </div>
+</dialog>

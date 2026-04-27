@@ -7,23 +7,27 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 20px;
+  /* On augmente le minmax pour que les tuiles puissent accueillir les images de 250px */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
   margin-top: 40px;
 }
 
 /* Base des carrés */
 .card {
-  aspect-ratio: 1 / 1;
+  /* On enlève l'aspect-ratio fixe pour laisser la carte s'adapter au contenu */
+  aspect-ratio: auto;
+  min-height: 350px;
+  padding: 20px;
   background: white;
-  border-radius: 15px;
+  border-radius: 20px;
   border: 1px solid #ddd;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease;
 }
 
 .card:hover {
@@ -31,23 +35,51 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
+.card-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 5px;
+}
+
 /* Style spécifique profil */
 .profile {
   background: #fdfdfd;
+  position: relative;
 }
 
 .initial {
-  width: 60px;
-  height: 60px;
-  background: #d42426; /* Rouge Noël */
+  width: 100%;
+  height: 100%;
+  background: #d42426;
   color: white;
-  font-size: 24px;
+  font-size: 80px; /* On augmente massivement la taille de la lettre */
   font-weight: bold;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
+}
+
+/* Conteneur pour maintenir l'alignement */
+.avatar-container {
+  width: 250px; /* La taille que tu as demandée */
+  height: 250px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style de l'image pour qu'elle ressemble au rond de l'initiale */
+.profile-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #eee;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
 /* Style bouton ajouter */
@@ -63,6 +95,101 @@
 }
 
 .name {
+  font-family: var(--font-body);
+  font-size: 1.2rem; /* On grossit un peu le nom pour équilibrer avec l'image */
   font-weight: 500;
   color: #333;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  font-size: 18px;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 36px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  font-size: 18px;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.edit-btn:hover {
+  background: #095228; /* Vert Noël au survol */
+  color: white;
+  transform: scale(1.1);
+}
+
+.delete-btn:hover {
+  background: #d42426; /* Rouge Noël au survol */
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Style de la modale native */
+.modal {
+  border: none;
+  border-radius: 15px;
+  padding: 0;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 8px;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
 }

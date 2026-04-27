@@ -1,1 +1,26 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Mountains+of+Christmas:wght@400;700&display=swap');
+
+:root {
+  /* On définit les polices comme variables */
+  --font-title: 'Mountains of Christmas', cursive;
+  --font-body: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #f8f9fa;
+  color: #2c3e50;
+  margin: 0;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-title);
+  color: #d42426; /* Rouge Noël */
+}
+
+/* On applique la police de titre à nos noms sur les cartes */
+.name {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
