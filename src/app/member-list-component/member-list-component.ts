@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Supabase } from '../services/supabase';
 import { Gift } from '../models/gift/gift';
@@ -28,7 +28,35 @@ export class MemberListComponent implements OnInit {
     price: undefined,
     url: '',
     image_url: '',
+    is_important: false,
   };
+
+  currentYear = new Date().getFullYear();
+  availableYears = [
+    this.currentYear,
+    this.currentYear - 1,
+    this.currentYear - 2,
+    this.currentYear - 3,
+  ];
+
+  selectedYears = signal<number[]>([]);
+  filteredGifts = computed(() => {
+    const years = this.selectedYears();
+    const allGifts = this.gifts();
+
+    // Si aucune année n'est sélectionnée, on affiche tout
+    if (years.length === 0) return allGifts;
+
+    return allGifts.filter((gift) => {
+      if (!gift.created_at) return false;
+
+      // Extraction robuste de l'année
+      const giftYear = parseInt(gift.created_at.split('-')[0]);
+
+      // On garde l'objet si son année est présente dans notre tableau de filtres
+      return years.includes(giftYear);
+    });
+  });
 
   constructor(
     private route: ActivatedRoute,
@@ -52,6 +80,16 @@ export class MemberListComponent implements OnInit {
 
     // On récupère les cadeaux liés à ce membre
     const data = await this.supabaseSvc.getGiftsByMember(this.memberId);
+    if (data) {
+      // Tri : Important d'abord, puis par titre
+      const sortedGifts = data.sort((a, b) => {
+        if (a.is_important === b.is_important) {
+          return a.title.localeCompare(b.title);
+        }
+        return a.is_important ? -1 : 1;
+      });
+      this.gifts.set(sortedGifts);
+    }
     this.gifts.set(data);
   }
 
@@ -65,6 +103,7 @@ export class MemberListComponent implements OnInit {
       title: '',
       comment: '',
       url: '',
+      is_important: false,
     };
     this.giftModal.nativeElement.showModal();
   }
@@ -96,24 +135,39 @@ export class MemberListComponent implements OnInit {
   async saveGift() {
     if (!this.newGift.title) return;
 
+    // Préparation des données communes
+    const giftData: any = {
+      title: this.newGift.title,
+      comment: this.newGift.comment,
+      price: this.newGift.price,
+      image_url: this.newGift.image_url,
+      is_important: this.newGift.is_important || false,
+    };
+
+    // On ajoute l'URL seulement si elle passe le test
+    if (this.isValidUrl(this.newGift.url)) {
+      giftData.url = this.newGift.url;
+    } else {
+      giftData.url = null; // Ou on laisse undefined selon ta structure BDD
+    }
+
     try {
       if (this.newGift.id) {
-        await this.supabaseSvc.updateGift(this.newGift.id, {
-          title: this.newGift.title,
-          comment: this.newGift.comment,
-          price: this.newGift.price,
-          url: this.newGift.url,
-        });
-        await this.loadMemberData(); // Rafraîchit la liste
+        // MODIFICATION
+        await this.supabaseSvc.updateGift(this.newGift.id, giftData);
         this.closeGiftUpdateModal();
       } else {
-        await this.supabaseSvc.addGift(this.newGift);
-        await this.loadMemberData(); // Rafraîchit la liste
+        // AJOUT
+        // On s'assure que member_id est présent pour le nouvel objet
+        const newObject = { ...giftData, member_id: this.memberId };
+        await this.supabaseSvc.addGift(newObject);
         this.closeGiftModal();
       }
+
+      await this.loadMemberData(); // Rafraîchit la liste dans tous les cas
     } catch (err) {
-      console.log(err);
-      alert("Erreur lors de l'ajout du cadeau");
+      console.error(err);
+      alert("Erreur lors de l'enregistrement du cadeau");
     }
   }
 
@@ -154,7 +208,7 @@ export class MemberListComponent implements OnInit {
         const data = await response.json();
         if (data && data.image) {
           this.newGift.image_url = data.image;
-          if (!this.newGift.title) this.newGift.title = data.title;
+          this.newGift.title = data.title;
         }
       } else {
         this.newGift.image_url = undefined;
@@ -164,6 +218,52 @@ export class MemberListComponent implements OnInit {
     } finally {
       // Dans tous les cas (succès ou erreur), on arrête la roue
       this.isSearching.set(false);
+    }
+  }
+
+  isValidUrl(url: string | undefined): boolean {
+    if (!url || url.trim() === '') return false;
+    try {
+      new URL(url); // Tente de construire l'URL
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  getYear(dateString: string | undefined): string {
+    if (!dateString) return new Date().getFullYear().toString();
+    return new Date(dateString).getFullYear().toString();
+  }
+
+  formatDateFr(dateString: string): string {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+
+    // Configuration du formatage en français
+    const formatter = new Intl.DateTimeFormat('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    const formattedDate = formatter.format(date);
+
+    // Optionnel : Mettre la première lettre en majuscule (Lundi...)
+    return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+  }
+
+  toggleYearFilter(year: number) {
+    const currentFilters = this.selectedYears();
+
+    if (currentFilters.includes(year)) {
+      // Si l'année est déjà là, on la retire (Désélection)
+      this.selectedYears.set(currentFilters.filter((y) => y !== year));
+    } else {
+      // Sinon, on l'ajoute au tableau (Cumul)
+      this.selectedYears.set([...currentFilters, year]);
     }
   }
 }

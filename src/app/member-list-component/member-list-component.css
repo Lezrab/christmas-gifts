@@ -382,3 +382,134 @@
   font-weight: bold;
   color: #2c3e50;
 }
+
+/* Bordure spéciale pour les objets importants */
+.gift-card.important {
+  border: 2px solid #b8860b; /* Couleur Or */
+  box-shadow: 0 10px 25px rgba(184, 134, 11, 0.2);
+}
+
+.badges-wrapper {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: row-reverse; /* La priorité sera à droite de l'année */
+  gap: 6px;
+  z-index: 10;
+}
+
+/* Style commun aux badges */
+.badge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+}
+
+/* Badge Priorité (Or) */
+.priority-badge {
+  background: #b8860b;
+}
+
+/* Badge Année (Bleu Nuit) */
+.year-badge {
+  background: #1a3a6d;
+}
+
+/* Ajustement pour les boutons d'actions */
+.gift-card .card-actions {
+  top: 42px; /* On descend un peu les boutons pour ne pas gêner les badges */
+}
+
+.priority-group {
+  /* Aligne la checkbox et le label sur la même ligne */
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: center; /* Centre le bloc entier dans la modale */
+  gap: 12px;               /* Espace entre la case et le texte */
+  margin: 20px 0;
+  cursor: pointer;
+}
+
+.priority-group input[type="checkbox"] {
+  /* On force une taille fixe pour que la case ne s'écrase pas */
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.priority-group label {
+  /* On enlève les marges par défaut des labels du formulaire */
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #444;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.filter-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.year-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-year {
+  background: white;
+  color: #1a3a6d;
+  border: 2px solid #1a3a6d;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-year:hover {
+  background: #f0f4f8;
+}
+
+.btn-year.active {
+  background: #1a3a6d;
+  color: white;
+  box-shadow: 0 4px 10px rgba(26, 58, 109, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-reset {
+  background: none;
+  border: none;
+  color: #d42426;
+  text-decoration: underline;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px;
+}
