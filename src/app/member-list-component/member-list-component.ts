@@ -1,9 +1,10 @@
-import { Component, computed, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Supabase } from '../services/supabase';
 import { Gift } from '../models/gift/gift';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-member-list',
@@ -20,6 +21,7 @@ export class MemberListComponent implements OnInit {
   @ViewChild('giftModal') giftModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('giftUpdateModal') giftUpdateModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('detailsModal') detailsModal!: ElementRef<HTMLDialogElement>;
+  private titleService = inject(Title);
 
   // Objet tampon pour le nouveau cadeau
   newGift: Partial<Gift> = {
@@ -77,6 +79,7 @@ export class MemberListComponent implements OnInit {
     // On récupère le profil pour avoir le nom
     const profile = await this.supabaseSvc.getProfileById(this.memberId);
     this.memberName.set(profile?.name || 'Inconnu');
+    this.titleService.setTitle(`La hotte de ${profile?.name}`);
 
     // On récupère les cadeaux liés à ce membre
     const data = await this.supabaseSvc.getGiftsByMember(this.memberId);
@@ -265,5 +268,10 @@ export class MemberListComponent implements OnInit {
       // Sinon, on l'ajoute au tableau (Cumul)
       this.selectedYears.set([...currentFilters, year]);
     }
+  }
+
+  ngOnDestroy() {
+    // Remet le titre d'origine de ton app
+    this.titleService.setTitle('Mon App Cadeaux 🎁');
   }
 }
