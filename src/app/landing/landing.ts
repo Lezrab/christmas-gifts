@@ -15,7 +15,7 @@ export class LandingComponent implements OnInit {
   // On utilise un signal pour une UI réactive
   familyMembers = signal<any[]>([]);
   // Objet tampon pour la modification
-  selectedMember: any = { id: '', name: '', avatar_url: '' };
+  selectedMember: any = { id: '', name: '', mail: '', avatar_url: '' };
 
   constructor(
     private supabaseSvc: Supabase,
@@ -72,6 +72,7 @@ export class LandingComponent implements OnInit {
   async saveProfile() {
     const { error } = await this.supabaseSvc.updateProfile(this.selectedMember.id, {
       name: this.selectedMember.name,
+      mail: this.selectedMember.mail,
       avatar_url: this.selectedMember.avatar_url,
     });
 
@@ -92,6 +93,17 @@ export class LandingComponent implements OnInit {
       } catch (err) {
         alert("Erreur lors de l'upload");
       }
+    }
+  }
+
+  onBackdropClick(event: MouseEvent) {
+    // On récupère l'élément dialog
+    const dialogElement = event.target as HTMLDialogElement;
+
+    // Si l'élément cliqué est le dialog lui-même (et non ses enfants comme la div modal-content)
+    // cela signifie qu'on a cliqué sur le "backdrop" (le fond sombre)
+    if (dialogElement.tagName === 'DIALOG') {
+      this.closeModal();
     }
   }
 }

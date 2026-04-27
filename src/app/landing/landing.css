@@ -37,10 +37,10 @@
 
 .card-actions {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 10px; /* Légèrement descendu pour respirer */
+  right: 10px;
   display: flex;
-  gap: 5px;
+  gap: 8px; /* Plus d'espace entre les boutons */
 }
 
 /* Style spécifique profil */
@@ -84,9 +84,28 @@
 
 /* Style bouton ajouter */
 .add-card {
-  border: 2px dashed #bbb;
-  background: transparent;
-  color: #888;
+  border: 3px dashed #d42426; /* Pointillés rouges */
+  background: #fff5f5; /* Fond très légèrement rosé */
+  color: #d42426; /* Texte rouge */
+  transition: all 0.3s ease;
+}
+
+.add-card:hover {
+  border-style: solid; /* Devient ligne pleine */
+  background: white;
+  transform: translateY(-5px); /* S'élève */
+  box-shadow: 0 10px 20px rgba(212, 36, 38, 0.2); /* Ombre rouge */
+}
+
+.add-card .icon-plus {
+  font-size: 50px;
+  color: #d42426; /* Plus rouge */
+  margin-bottom: 10px;
+}
+
+.add-card .name {
+  color: #d42426;
+  font-weight: bold;
 }
 
 .icon-plus {
@@ -187,9 +206,61 @@
   font-size: 16px;
 }
 
+/* --- Boutons dans la Modale (Annuler / Enregistrer) --- */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 15px; /* Plus d'espace */
+  margin-top: 25px;
+}
+
+/* Style commun pour les gros boutons */
+.btn-cancel,
+.btn-save {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 30px; /* Très arrondi */
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase; /* Lettres capitales */
+  letter-spacing: 1px;
+}
+
+/* Bouton Annuler (Style "Sucre d'Orge" discret) */
+.btn-cancel {
+  background: white;
+  color: #333;
+  border: 2px solid #ddd;
+}
+
+.btn-cancel:hover {
+  background: #f8f8f8;
+  border-color: #d42426; /* Devient rouge au survol */
+  color: #d42426;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Bouton Enregistrer (Style "Cadeau" Doré/Vert) */
+.btn-save {
+  background: #095228; /* Vert sapin */
+  color: white;
+  border: 2px solid #095228;
+  box-shadow: 0 4px 15px rgba(9, 82, 40, 0.3); /* Ombre verte */
+}
+
+.btn-save:hover {
+  background: #0b6631; /* Vert un peu plus clair */
+  transform: scale(1.05); /* Grossit légèrement */
+  box-shadow: 0 6px 20px rgba(9, 82, 40, 0.4);
+}
+
+/* Désactivé (si l'email est invalide par exemple) */
+.btn-save:disabled {
+  background: #aab;
+  border-color: #aab;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }

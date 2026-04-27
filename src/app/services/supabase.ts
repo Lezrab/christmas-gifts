@@ -27,7 +27,7 @@ export class Supabase {
     return error;
   }
 
-  async updateProfile(id: string, updates: { name?: string; avatar_url?: string }) {
+  async updateProfile(id: string, updates: { name?: string; mail?: string, avatar_url?: string }) {
     const { data, error } = await this.supabase
       .from('profiles')
       .update(updates)
