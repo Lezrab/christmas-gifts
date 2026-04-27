@@ -17,6 +17,18 @@ export class LandingComponent implements OnInit {
   // Objet tampon pour la modification
   selectedMember: any = { id: '', name: '', mail: '', avatar_url: '' };
 
+  // Liste de couleurs festives
+  private festiveColors = [
+    '#d42426',
+    '#095228',
+    '#1a3a6d',
+    '#b8860b',
+    '#7b1315',
+    '#2d5a27',
+    '#cf1124',
+    '#043927',
+  ];
+
   constructor(
     private supabaseSvc: Supabase,
     private router: Router,
@@ -105,5 +117,10 @@ export class LandingComponent implements OnInit {
     if (dialogElement.tagName === 'DIALOG') {
       this.closeModal();
     }
+  }
+
+  getRandomColor(): string {
+    const randomIndex = Math.floor(Math.random() * this.festiveColors.length);
+    return this.festiveColors[randomIndex];
   }
 }

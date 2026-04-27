@@ -16,7 +16,10 @@ export class MemberListComponent implements OnInit {
   memberId = '';
   memberName = signal('');
   gifts = signal<Gift[]>([]);
-  @ViewChild('giftModal') modal!: ElementRef<HTMLDialogElement>;
+  selectedGift = signal<any>(null);
+  @ViewChild('giftModal') giftModal!: ElementRef<HTMLDialogElement>;
+  @ViewChild('giftUpdateModal') giftUpdateModal!: ElementRef<HTMLDialogElement>;
+  @ViewChild('detailsModal') detailsModal!: ElementRef<HTMLDialogElement>;
 
   // Objet tampon pour le nouveau cadeau
   newGift: Partial<Gift> = {
@@ -24,7 +27,7 @@ export class MemberListComponent implements OnInit {
     comment: '',
     price: undefined,
     url: '',
-    image_url: ''
+    image_url: '',
   };
 
   constructor(
@@ -63,37 +66,53 @@ export class MemberListComponent implements OnInit {
       comment: '',
       url: '',
     };
-    this.modal.nativeElement.showModal();
+    this.giftModal.nativeElement.showModal();
   }
 
   closeGiftModal() {
-    this.modal.nativeElement.close();
+    this.giftModal.nativeElement.close();
+  }
+
+  openGiftUpdateModal(gift: any) {
+    this.newGift = { ...gift };
+    this.giftUpdateModal.nativeElement.showModal();
+  }
+
+  closeGiftUpdateModal() {
+    this.giftUpdateModal.nativeElement.close();
+    this.newGift = {};
+  }
+
+  openDetailsModal(gift: any) {
+    this.selectedGift.set(gift);
+    this.detailsModal.nativeElement.showModal();
+  }
+
+  closeDetailsModal() {
+    this.detailsModal.nativeElement.close();
+    this.selectedGift.set(null);
   }
 
   async saveGift() {
     if (!this.newGift.title) return;
 
     try {
-      const url = this.newGift.url;
-      if (!url || !url.startsWith('http')) return;
-      try {
-        const apiKey = environment.linkPreviewKey;
-        const response = await fetch(`https://api.linkpreview.net/?key=${apiKey}&q=${url}`);
-        const data = await response.json();
-
-        if (data) {
-          if (!this.newGift.title) this.newGift.title = data.title;
-          this.newGift.image_url = data.image;
-        }
-      } catch (err) {
-        console.log(err)
+      if (this.newGift.id) {
+        await this.supabaseSvc.updateGift(this.newGift.id, {
+          title: this.newGift.title,
+          comment: this.newGift.comment,
+          price: this.newGift.price,
+          url: this.newGift.url,
+        });
+        await this.loadMemberData(); // Rafraîchit la liste
+        this.closeGiftUpdateModal();
+      } else {
+        await this.supabaseSvc.addGift(this.newGift);
+        await this.loadMemberData(); // Rafraîchit la liste
+        this.closeGiftModal();
       }
-
-      await this.supabaseSvc.addGift(this.newGift);
-      await this.loadMemberData(); // Rafraîchit la liste
-      this.closeGiftModal();
     } catch (err) {
-      console.log(err)
+      console.log(err);
       alert("Erreur lors de l'ajout du cadeau");
     }
   }
@@ -101,47 +120,50 @@ export class MemberListComponent implements OnInit {
   onBackdropClick(event: MouseEvent) {
     if ((event.target as HTMLElement).tagName === 'DIALOG') {
       this.closeGiftModal();
+      this.closeDetailsModal();
+      this.closeGiftUpdateModal();
     }
   }
 
   async deleteGift(event: Event, id: any) {
     event.stopPropagation(); // Empêche de déclencher d'autres clics
-    if (confirm('Supprimer cette idée cadeau ?')) {
-      await this.supabaseSvc.deleteGift(id); // À ajouter dans ton service
-      this.gifts.update((current) => current.filter((g) => g.id !== id));
-    }
+    await this.supabaseSvc.deleteGift(id); // À ajouter dans ton service
+    this.gifts.update((current) => current.filter((g) => g.id !== id));
   }
 
-  editGift(event: Event, gift: any) {
-    event.stopPropagation();
-    this.newGift = { ...gift }; // On remplit l'objet tampon
-    this.modal.nativeElement.showModal();
-  }
+  // Dans ta classe MemberListComponent
+  isSearching = signal(false);
 
   async onUrlPaste() {
     const url = this.newGift.url;
-    if (!url || !url.startsWith('http')) return;
 
-    const apiKey = environment.linkPreviewKey;
+    if (!url || url.trim() === '') {
+      this.newGift.image_url = undefined;
+      return;
+    }
+
+    // On lance le chargement
+    this.isSearching.set(true);
 
     try {
       const response = await fetch(`https://api.linkpreview.net/?q=${url}`, {
-        method: 'POST',
-        headers: {
-          'X-Linkpreview-Api-Key': environment.linkPreviewKey,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'X-Linkpreview-Api-Key': environment.linkPreviewKey },
       });
-      const data = await response.json();
 
-      if (data) {
-        // On remplit automatiquement les champs s'ils sont vides
-        if (!this.newGift.title) this.newGift.title = data.title;
-        if (!this.newGift.comment) this.newGift.comment = data.description;
-        this.newGift.image_url = data.image;
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.image) {
+          this.newGift.image_url = data.image;
+          if (!this.newGift.title) this.newGift.title = data.title;
+        }
+      } else {
+        this.newGift.image_url = undefined;
       }
     } catch (err) {
-      console.error('Impossible de récupérer la preview', err);
+      this.newGift.image_url = undefined;
+    } finally {
+      // Dans tous les cas (succès ou erreur), on arrête la roue
+      this.isSearching.set(false);
     }
   }
 }

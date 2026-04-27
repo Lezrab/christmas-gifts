@@ -79,7 +79,7 @@ export class Supabase {
     return error;
   }
 
-  async updateGift(id: string, updates: { name?: string; mail?: string; avatar_url?: string }) {
+  async updateGift(id: string, updates: { title?: string; comment?: string; url?: string, price?: number }) {
     const { data, error } = await this.supabase.from('gifts').update(updates).eq('id', id).select();
     return { data, error };
   }

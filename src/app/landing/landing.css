@@ -52,7 +52,6 @@
 .initial {
   width: 100%;
   height: 100%;
-  background: #d42426;
   color: white;
   font-size: 80px; /* On augmente massivement la taille de la lettre */
   font-weight: bold;

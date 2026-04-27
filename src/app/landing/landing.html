@@ -18,7 +18,7 @@
           @if (member.avatar_url) {
             <img [src]="member.avatar_url" class="profile-img" alt="Avatar">
           } @else {
-            <div class="initial">{{ member.name.charAt(0) }}</div>
+            <div class="initial" [style.background-color]="getRandomColor()">{{ member.name.charAt(0) }}</div>
           }
         </div>
 
