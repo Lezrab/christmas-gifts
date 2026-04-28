@@ -36,9 +36,9 @@ export class MemberListComponent implements OnInit {
   currentYear = new Date().getFullYear();
   availableYears = [
     this.currentYear,
-    this.currentYear - 1,
-    this.currentYear - 2,
-    this.currentYear - 3,
+    this.currentYear + 1,
+    this.currentYear + 2,
+    this.currentYear + 3,
   ];
 
   selectedYears = signal<number[]>([]);
