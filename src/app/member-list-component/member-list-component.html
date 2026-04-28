@@ -30,14 +30,14 @@
       <div class="gift-card" (click)="openDetailsModal(gift)" [class.important]="gift.is_important">
 
         <div class="badges-wrapper">
-          @if (gift.is_important) {
-            <div class="badge priority-badge">
-              <span>⭐</span> Favori
-            </div>
-          }
           <div class="badge year-badge">
             <span>📅</span> {{ getYear(gift.created_at) }}
           </div>
+          @if (gift.is_important) {
+            <div class="badge priority-badge">
+              <span>⭐</span>
+            </div>
+          }
         </div>
 
         <div class="gift-image-preview">
@@ -76,7 +76,7 @@
     <h2>Nouvelle Idée Cadeau 🎁</h2>
 
     <div class="form-group">
-      <label>Nom du cadeau</label>
+      <label>Titre</label>
       <input type="text" [(ngModel)]="newGift.title" placeholder="Ex: Gants en laine" required>
     </div>
 
@@ -127,7 +127,7 @@
     <h2>Nouvelle Idée Cadeau 🎁</h2>
 
     <div class="form-group">
-      <label>Nom du cadeau</label>
+      <label>Titre</label>
       <input type="text" [(ngModel)]="newGift.title" placeholder="Ex: Gants en laine" required>
     </div>
 

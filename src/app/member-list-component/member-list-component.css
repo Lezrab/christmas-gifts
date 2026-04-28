@@ -392,7 +392,7 @@
 /* Bordure spéciale pour les objets importants */
 .gift-card.important {
   border: 2px solid #b8860b; /* Couleur Or */
-  box-shadow: 0 10px 25px rgba(184, 134, 11, 0.2);
+  box-shadow: 0 20px 50px rgba(184, 134, 11, 0.2);
 }
 
 .badges-wrapper {
@@ -400,7 +400,7 @@
   top: 10px;
   right: 10px;
   display: flex;
-  flex-direction: row-reverse; /* La priorité sera à droite de l'année */
+  flex-direction: row; /* La priorité sera à droite de l'année */
   gap: 6px;
   z-index: 10;
 }
@@ -421,7 +421,7 @@
 
 /* Badge Priorité (Or) */
 .priority-badge {
-  background: #b8860b;
+  background: #BA9503;
 }
 
 /* Badge Année (Bleu Nuit) */
