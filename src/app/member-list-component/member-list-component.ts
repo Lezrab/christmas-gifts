@@ -22,6 +22,8 @@ export class MemberListComponent implements OnInit {
   @ViewChild('giftUpdateModal') giftUpdateModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('detailsModal') detailsModal!: ElementRef<HTMLDialogElement>;
   private titleService = inject(Title);
+  selectedFile: File | null = null;
+  isUploading = signal(false);
 
   // Objet tampon pour le nouveau cadeau
   newGift: Partial<Gift> = {
@@ -31,6 +33,7 @@ export class MemberListComponent implements OnInit {
     url: '',
     image_url: '',
     is_important: false,
+    image_from_link_preview: false
   };
 
   currentYear = new Date().getFullYear();
@@ -107,6 +110,7 @@ export class MemberListComponent implements OnInit {
       comment: '',
       url: '',
       is_important: false,
+      image_url: '',
     };
     this.giftModal.nativeElement.showModal();
   }
@@ -138,20 +142,16 @@ export class MemberListComponent implements OnInit {
   async saveGift() {
     if (!this.newGift.title) return;
 
-    // Préparation des données communes
-    const giftData: any = {
-      title: this.newGift.title,
-      comment: this.newGift.comment,
-      price: this.newGift.price,
-      image_url: this.newGift.image_url,
-      is_important: this.newGift.is_important || false,
-    };
+    const giftData = { ...this.newGift };
 
     // On ajoute l'URL seulement si elle passe le test
     if (this.isValidUrl(this.newGift.url)) {
       giftData.url = this.newGift.url;
     } else {
-      giftData.url = null; // Ou on laisse undefined selon ta structure BDD
+      giftData.url = ''; // Ou on laisse undefined selon ta structure BDD
+      if (giftData.image_from_link_preview) {
+        giftData.image_url = '';
+      }
     }
 
     try {
@@ -166,7 +166,6 @@ export class MemberListComponent implements OnInit {
         await this.supabaseSvc.addGift(newObject);
         this.closeGiftModal();
       }
-
       await this.loadMemberData(); // Rafraîchit la liste dans tous les cas
     } catch (err) {
       console.error(err);
@@ -212,6 +211,7 @@ export class MemberListComponent implements OnInit {
         if (data && data.image) {
           this.newGift.image_url = data.image;
           this.newGift.title = data.title;
+          this.newGift.image_from_link_preview = true;
         }
       } else {
         this.newGift.image_url = undefined;
@@ -267,6 +267,28 @@ export class MemberListComponent implements OnInit {
     } else {
       // Sinon, on l'ajoute au tableau (Cumul)
       this.selectedYears.set([...currentFilters, year]);
+    }
+  }
+
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      this.isUploading.set(true);
+
+      // On lance l'upload immédiatement vers Supabase Storage
+      const publicUrl = await this.supabaseSvc.uploadGiftImage(file);
+
+      // On met à jour l'URL de l'image directement dans l'objet tampon
+      // Cela remplace l'image du LinkPreview par celle du bucket
+      this.newGift.image_url = publicUrl;
+
+      this.isUploading.set(false);
+    } catch (err) {
+      console.error("Échec de l'upload immédiat :", err);
+      this.isUploading.set(false);
+      alert("Erreur lors de l'envoi de l'image.");
     }
   }
 

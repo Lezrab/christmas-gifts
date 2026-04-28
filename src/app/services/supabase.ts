@@ -79,8 +79,26 @@ export class Supabase {
     return error;
   }
 
-  async updateGift(id: string, updates: { title?: string; comment?: string; url?: string, price?: number }) {
+  async updateGift(
+    id: string,
+    updates: { title?: string; comment?: string; url?: string; price?: number },
+  ) {
     const { data, error } = await this.supabase.from('gifts').update(updates).eq('id', id).select();
     return { data, error };
+  }
+
+  async uploadGiftImage(file: File): Promise<string> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await this.supabase.storage
+      .from('human_image_url')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = this.supabase.storage.from('human_image_url').getPublicUrl(fileName);
+
+    return data.publicUrl;
   }
 }

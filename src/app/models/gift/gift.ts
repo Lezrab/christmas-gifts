@@ -6,6 +6,7 @@ export interface Gift {
   comment?: string; // Détails (taille, couleur, etc.)
   url?: string; // Lien vers un site marchand (Amazon, etc.)
   price?: number; // Montant estimé,
-  image_url?: string;
+  image_url: string;
   is_important: boolean;
+  image_from_link_preview: boolean;
 }
