@@ -203,12 +203,12 @@
     </div>
 
     <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeDetailsModal()">Fermer</button>
       @if (selectedGift()?.url) {
         <a [href]="selectedGift()?.url" target="_blank" class="btn-save">
           Voir sur le site →
         </a>
       }
-      <button class="btn-cancel" (click)="closeDetailsModal()">Fermer</button>
     </div>
   </div>
 </dialog>
