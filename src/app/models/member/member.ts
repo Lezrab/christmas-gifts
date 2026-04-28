@@ -3,4 +3,5 @@ export interface Member {
   name: string;
   mail: string;
   avatar_url: string;
+  color?: string;
 }

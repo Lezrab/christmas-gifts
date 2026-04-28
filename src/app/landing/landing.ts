@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core'
 import { Supabase } from '../services/supabase';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import {Member} from "../models/member/member";
 
 @Component({
   selector: 'app-landing',
