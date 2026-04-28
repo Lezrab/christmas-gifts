@@ -78,10 +78,17 @@ export class MemberListComponent implements OnInit {
     }
   }
 
+  getTitreHotte(name: string) {
+    const voyelles = 'AEIOUÀÂÉÈÊËÎÏÔÛÙH';
+    const elision = voyelles.includes(name[0].toUpperCase());
+    return `La hotte ${elision ? "d'" : 'de '}${name} 🎄`;
+  }
+
   async loadMemberData() {
     // On récupère le profil pour avoir le nom
     const profile = await this.supabaseSvc.getProfileById(this.memberId);
     this.memberName.set(profile?.name || 'Inconnu');
+    this.titleService.setTitle(this.getTitreHotte(this.memberName()));
 
     // On récupère les cadeaux liés à ce membre
     const data = await this.supabaseSvc.getGiftsByMember(this.memberId);
@@ -292,12 +299,6 @@ export class MemberListComponent implements OnInit {
       this.isUploading.set(false);
       alert("Erreur lors de l'envoi de l'image.");
     }
-  }
-
-  getTitreHotte(name: string) {
-    const voyelles = 'AEIOUÀÂÉÈÊËÎÏÔÛÙH';
-    const elision = voyelles.includes(name[0].toUpperCase());
-    return `La hotte ${elision ? "d'" : 'de '}${name} 🎄`;
   }
 
   ngOnDestroy() {
