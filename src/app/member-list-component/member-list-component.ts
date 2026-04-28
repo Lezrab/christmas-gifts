@@ -33,7 +33,7 @@ export class MemberListComponent implements OnInit {
     url: '',
     image_url: '',
     is_important: false,
-    image_from_link_preview: false
+    image_from_link_preview: false,
   };
 
   currentYear = new Date().getFullYear();
@@ -276,12 +276,15 @@ export class MemberListComponent implements OnInit {
     try {
       this.isUploading.set(true);
 
-      // On lance l'upload immédiatement vers Supabase Storage
+      // 1. Upload vers le bucket
       const publicUrl = await this.supabaseSvc.uploadGiftImage(file);
 
-      // On met à jour l'URL de l'image directement dans l'objet tampon
-      // Cela remplace l'image du LinkPreview par celle du bucket
+      // 2. Mise à jour de l'URL
       this.newGift.image_url = publicUrl;
+
+      // 3. CRUCIAL : On indique que l'image est maintenant MANUELLE
+      // Cela "écrase" l'état précédent du LinkPreview
+      this.newGift.image_from_link_preview = false;
 
       this.isUploading.set(false);
     } catch (err) {
@@ -294,7 +297,7 @@ export class MemberListComponent implements OnInit {
   getTitreHotte(name: string) {
     const voyelles = 'AEIOUÀÂÉÈÊËÎÏÔÛÙH';
     const elision = voyelles.includes(name[0].toUpperCase());
-    return `La hotte ${elision ? "d'" : "de "}${name} 🎄`;
+    return `La hotte ${elision ? "d'" : 'de '}${name} 🎄`;
   }
 
   ngOnDestroy() {
