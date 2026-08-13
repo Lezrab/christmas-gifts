@@ -1,7 +1,7 @@
 // netlify/functions/keep-alive.js
 export default async () => {
   const url = process.env.SUPABASE_URL;
-  const anonKey = process.env.SUPABASE_ANON_KEY;
+  const anonKey = process.env.SUPABASE_KEY;
 
   try {
     const res = await fetch(
