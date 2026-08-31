@@ -5,6 +5,44 @@
   text-align: center;
 }
 
+.btn-trash {
+  margin-top: 15px;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 6px 16px;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btn-trash:hover {
+  border-color: #d42426;
+  color: #d42426;
+}
+
+.trash-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.trash-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.trash-actions button {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 20px;
+}
+
 .loader-container {
   display: flex;
   flex-direction: column;

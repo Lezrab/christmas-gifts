@@ -26,6 +26,8 @@ function queryBuilder(result: QueryResult) {
     eq: vi.fn(() => builder),
     order: vi.fn(() => builder),
     single: vi.fn(() => builder),
+    is: vi.fn(() => builder),
+    not: vi.fn(() => builder),
     then: (resolve: (value: QueryResult) => void) => resolve(result),
   };
   return builder;
@@ -88,6 +90,60 @@ describe('Supabase', () => {
 
     expect(builder.update).toHaveBeenCalledWith({ reserved_by: 'Alice' });
     expect(builder.eq).toHaveBeenCalledWith('id', 'g1');
+    expect(error).toBeNull();
+  });
+
+  it('deleteProfile soft-deletes by setting deleted_at instead of removing the row', async () => {
+    const builder = queryBuilder({ data: null, error: null });
+    fromMock.mockReturnValue(builder);
+
+    const error = await service.deleteProfile('1');
+
+    expect(builder.delete).not.toHaveBeenCalled();
+    expect(builder.update).toHaveBeenCalledWith(
+      expect.objectContaining({ deleted_at: expect.any(String) }),
+    );
+    expect(error).toBeNull();
+  });
+
+  it('restoreProfile clears deleted_at', async () => {
+    const builder = queryBuilder({ data: null, error: null });
+    fromMock.mockReturnValue(builder);
+
+    await service.restoreProfile('1');
+
+    expect(builder.update).toHaveBeenCalledWith({ deleted_at: null });
+  });
+
+  it('permanentlyDeleteProfile performs a real delete', async () => {
+    const builder = queryBuilder({ data: null, error: null });
+    fromMock.mockReturnValue(builder);
+
+    await service.permanentlyDeleteProfile('1');
+
+    expect(builder.delete).toHaveBeenCalled();
+  });
+
+  it('deleteGift soft-deletes by setting deleted_at instead of removing the row', async () => {
+    const builder = queryBuilder({ data: null, error: null });
+    fromMock.mockReturnValue(builder);
+
+    const error = await service.deleteGift('g1');
+
+    expect(builder.delete).not.toHaveBeenCalled();
+    expect(builder.update).toHaveBeenCalledWith(
+      expect.objectContaining({ deleted_at: expect.any(String) }),
+    );
+    expect(error).toBeNull();
+  });
+
+  it('setGiftPurchased updates the is_purchased column', async () => {
+    const builder = queryBuilder({ data: [{ id: 'g1', is_purchased: true }], error: null });
+    fromMock.mockReturnValue(builder);
+
+    const { error } = await service.setGiftPurchased('g1', true);
+
+    expect(builder.update).toHaveBeenCalledWith({ is_purchased: true });
     expect(error).toBeNull();
   });
 

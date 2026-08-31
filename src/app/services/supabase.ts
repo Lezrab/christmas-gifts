@@ -14,7 +14,11 @@ export class Supabase {
   }
 
   async getProfiles() {
-    const { data, error } = await this.supabase.from('profiles').select('*').order('name');
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .is('deleted_at', null)
+      .order('name');
     if (error) throw error;
     return data || [];
   }
@@ -25,7 +29,34 @@ export class Supabase {
     return data;
   }
 
+  // Suppression douce : le profil part à la corbeille au lieu d'être supprimé
   async deleteProfile(id: string) {
+    const { error } = await this.supabase
+      .from('profiles')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id);
+    return error;
+  }
+
+  async getDeletedProfiles() {
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
+
+  async restoreProfile(id: string) {
+    const { error } = await this.supabase
+      .from('profiles')
+      .update({ deleted_at: null })
+      .eq('id', id);
+    return error;
+  }
+
+  async permanentlyDeleteProfile(id: string) {
     const { error } = await this.supabase.from('profiles').delete().eq('id', id);
     return error;
   }
@@ -68,6 +99,7 @@ export class Supabase {
       .from('gifts')
       .select('*')
       .eq('member_id', memberId)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -80,14 +112,39 @@ export class Supabase {
     if (error) throw error;
   }
 
+  // Suppression douce : le cadeau part à la corbeille au lieu d'être supprimé
   async deleteGift(id: string) {
+    const { error } = await this.supabase
+      .from('gifts')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id);
+    return error;
+  }
+
+  async getDeletedGiftsByMember(memberId: string): Promise<Gift[]> {
+    const { data, error } = await this.supabase
+      .from('gifts')
+      .select('*')
+      .eq('member_id', memberId)
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
+
+  async restoreGift(id: string) {
+    const { error } = await this.supabase.from('gifts').update({ deleted_at: null }).eq('id', id);
+    return error;
+  }
+
+  async permanentlyDeleteGift(id: string) {
     const { error } = await this.supabase.from('gifts').delete().eq('id', id);
     return error;
   }
 
   async updateGift(
     id: string,
-    updates: { title?: string; comment?: string; url?: string; price?: number },
+    updates: { title?: string; comment?: string; url?: string; price?: number; is_purchased?: boolean },
   ) {
     const { data, error } = await this.supabase.from('gifts').update(updates).eq('id', id).select();
     return { data, error };
@@ -105,6 +162,15 @@ export class Supabase {
     const { data } = this.supabase.storage.from('human_image_url').getPublicUrl(fileName);
 
     return data.publicUrl;
+  }
+
+  async setGiftPurchased(id: string, isPurchased: boolean) {
+    const { data, error } = await this.supabase
+      .from('gifts')
+      .update({ is_purchased: isPurchased })
+      .eq('id', id)
+      .select();
+    return { data, error };
   }
 
   async reserveGift(id: string, reservedBy: string | null) {

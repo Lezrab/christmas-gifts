@@ -17,9 +17,11 @@ export class MemberListComponent implements OnInit {
   memberId = '';
   memberName = signal('');
   gifts = signal<Gift[]>([]);
+  deletedGifts = signal<Gift[]>([]);
   selectedGift = signal<Gift | null>(null);
   @ViewChild('giftModal') giftModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('detailsModal') detailsModal!: ElementRef<HTMLDialogElement>;
+  @ViewChild('trashModal') trashModal!: ElementRef<HTMLDialogElement>;
   private titleService = inject(Title);
   isUploading = signal(false);
 
@@ -177,16 +179,89 @@ export class MemberListComponent implements OnInit {
   }
 
   onBackdropClick(event: MouseEvent) {
-    if ((event.target as HTMLElement).tagName === 'DIALOG') {
-      this.closeGiftModal();
-      this.closeDetailsModal();
+    const dialogElement = event.target as HTMLDialogElement;
+    if (dialogElement.tagName !== 'DIALOG') return;
+
+    dialogElement.close();
+    if (dialogElement === this.giftModal?.nativeElement) {
+      this.newGift = {};
+    }
+    if (dialogElement === this.detailsModal?.nativeElement) {
+      this.selectedGift.set(null);
     }
   }
 
+  // Suppression douce : le cadeau part à la corbeille
   async deleteGift(event: Event, id: string) {
     event.stopPropagation(); // Empêche de déclencher d'autres clics
     await this.supabaseSvc.deleteGift(id);
     this.gifts.update((current) => current.filter((g) => g.id !== id));
+  }
+
+  async openTrash() {
+    try {
+      const deleted = await this.supabaseSvc.getDeletedGiftsByMember(this.memberId);
+      this.deletedGifts.set(deleted);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors du chargement de la corbeille');
+      return;
+    }
+    this.trashModal.nativeElement.showModal();
+  }
+
+  closeTrash() {
+    this.trashModal.nativeElement.close();
+  }
+
+  async restoreGift(id: string) {
+    const error = await this.supabaseSvc.restoreGift(id);
+    if (error) {
+      alert('Erreur lors de la restauration');
+      return;
+    }
+    this.deletedGifts.update((current) => current.filter((g) => g.id !== id));
+    await this.loadMemberData();
+  }
+
+  async permanentlyDeleteGift(id: string) {
+    const confirmDelete = confirm(
+      'Supprimer définitivement ce cadeau ? Cette action est irréversible.',
+    );
+    if (!confirmDelete) return;
+
+    const error = await this.supabaseSvc.permanentlyDeleteGift(id);
+    if (error) {
+      alert('Erreur lors de la suppression définitive');
+      return;
+    }
+    this.deletedGifts.update((current) => current.filter((g) => g.id !== id));
+  }
+
+  async togglePurchased(event: Event, gift: Gift) {
+    event.stopPropagation();
+    if (!gift.id) return;
+
+    const nextValue = !gift.is_purchased;
+    const { error } = await this.supabaseSvc.setGiftPurchased(gift.id, nextValue);
+    if (error) {
+      alert('Erreur lors de la mise à jour');
+      return;
+    }
+    this.applyPurchased(gift.id, nextValue);
+  }
+
+  private applyPurchased(giftId: string, isPurchased: boolean) {
+    this.gifts.update((current) =>
+      current.map((g) => (g.id === giftId ? { ...g, is_purchased: isPurchased } : g)),
+    );
+    if (this.selectedGift()?.id === giftId) {
+      this.selectedGift.update((g) => (g ? { ...g, is_purchased: isPurchased } : g));
+    }
+  }
+
+  printList() {
+    window.print();
   }
 
   async reserveGift(event: Event, gift: Gift) {

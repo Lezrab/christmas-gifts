@@ -16,6 +16,98 @@
   text-align: center;
 }
 
+.header-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-icon-text {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 6px 16px;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btn-icon-text:hover {
+  border-color: #095228;
+  color: #095228;
+}
+
+.trash-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.trash-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.trash-actions button {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 20px;
+}
+
+/* --- CADEAU MARQUÉ ACHETÉ --- */
+.gift-card.purchased {
+  opacity: 0.5;
+}
+
+.purchased-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* --- IMPRESSION --- */
+@media print {
+  .header-actions,
+  .list-header .btn-save,
+  .filter-container,
+  .add-gift-card,
+  .card-actions,
+  .badges-wrapper,
+  .purchased-overlay,
+  dialog {
+    display: none !important;
+  }
+
+  .gift-grid {
+    display: block;
+  }
+
+  .gift-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 12px;
+    opacity: 1 !important;
+  }
+
+  .gift-image-preview {
+    display: none;
+  }
+}
+
 /* --- GRILLE --- */
 .gift-grid {
   display: grid;

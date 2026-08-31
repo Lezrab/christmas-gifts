@@ -5,6 +5,13 @@ import { MemberListComponent } from './member-list-component';
 import { Supabase } from '../services/supabase';
 import { Gift } from '../models/gift/gift';
 
+// jsdom n'implémente pas showModal() sur <dialog>
+if (!HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+    this.setAttribute('open', '');
+  };
+}
+
 describe('MemberListComponent', () => {
   let component: MemberListComponent;
   let fixture: ComponentFixture<MemberListComponent>;
@@ -39,6 +46,10 @@ describe('MemberListComponent', () => {
       updateGift: vi.fn().mockResolvedValue({ data: [], error: null }),
       deleteGift: vi.fn().mockResolvedValue(null),
       reserveGift: vi.fn().mockResolvedValue({ data: [], error: null }),
+      setGiftPurchased: vi.fn().mockResolvedValue({ data: [], error: null }),
+      getDeletedGiftsByMember: vi.fn().mockResolvedValue([]),
+      restoreGift: vi.fn().mockResolvedValue(null),
+      permanentlyDeleteGift: vi.fn().mockResolvedValue(null),
     };
 
     await TestBed.configureTestingModule({
@@ -136,5 +147,71 @@ describe('MemberListComponent', () => {
     expect(component.isValidUrl('not-a-url')).toBe(false);
     expect(component.isValidUrl('')).toBe(false);
     expect(component.isValidUrl(undefined)).toBe(false);
+  });
+
+  it('marks a gift as purchased and toggles it back', async () => {
+    const event = new Event('click');
+
+    await component.togglePurchased(event, gifts[0]);
+    expect(supabaseMock['setGiftPurchased']).toHaveBeenCalledWith('g1', true);
+    expect(component.gifts().find((g) => g.id === 'g1')?.is_purchased).toBe(true);
+
+    const purchased = { ...gifts[0], is_purchased: true };
+    await component.togglePurchased(event, purchased);
+    expect(supabaseMock['setGiftPurchased']).toHaveBeenCalledWith('g1', false);
+  });
+
+  it('sends the gift to the trash and moves it out of the active list', async () => {
+    const event = new Event('click');
+
+    await component.deleteGift(event, 'g1');
+
+    expect(supabaseMock['deleteGift']).toHaveBeenCalledWith('g1');
+    expect(component.gifts().find((g) => g.id === 'g1')).toBeUndefined();
+  });
+
+  it('loads the deleted gifts when opening the trash', async () => {
+    supabaseMock['getDeletedGiftsByMember'].mockResolvedValueOnce([gifts[0]]);
+
+    await component.openTrash();
+
+    expect(supabaseMock['getDeletedGiftsByMember']).toHaveBeenCalledWith('member-1');
+    expect(component.deletedGifts()).toEqual([gifts[0]]);
+  });
+
+  it('restores a gift from the trash and refreshes the active list', async () => {
+    component.deletedGifts.set([gifts[0]]);
+
+    await component.restoreGift('g1');
+
+    expect(supabaseMock['restoreGift']).toHaveBeenCalledWith('g1');
+    expect(component.deletedGifts()).toEqual([]);
+  });
+
+  it('permanently deletes a gift after confirmation', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    component.deletedGifts.set([gifts[0]]);
+
+    await component.permanentlyDeleteGift('g1');
+
+    expect(supabaseMock['permanentlyDeleteGift']).toHaveBeenCalledWith('g1');
+    expect(component.deletedGifts()).toEqual([]);
+  });
+
+  it('does not permanently delete a gift when the confirmation is cancelled', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    component.deletedGifts.set([gifts[0]]);
+
+    await component.permanentlyDeleteGift('g1');
+
+    expect(supabaseMock['permanentlyDeleteGift']).not.toHaveBeenCalled();
+  });
+
+  it('triggers the browser print dialog', () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
+
+    component.printList();
+
+    expect(printSpy).toHaveBeenCalled();
   });
 });

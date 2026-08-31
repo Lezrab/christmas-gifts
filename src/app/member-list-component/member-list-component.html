@@ -4,6 +4,10 @@
       <span>←</span> Retour
     </button>
     <h1>{{ getTitreHotte(memberName()) }}</h1>
+    <div class="header-actions">
+      <button class="btn-icon-text" (click)="printList()">🖨️ Imprimer</button>
+      <button class="btn-icon-text" (click)="openTrash()">🗑️ Corbeille</button>
+    </div>
   </header>
 
   <div class="filter-container">
@@ -27,7 +31,15 @@
     </div>
 
     @for (gift of filteredGifts(); track gift.id) {
-      <div class="gift-card" (click)="openDetailsModal(gift)" [class.important]="gift.is_important">
+      <div
+        class="gift-card"
+        (click)="openDetailsModal(gift)"
+        [class.important]="gift.is_important"
+        [class.purchased]="gift.is_purchased">
+
+        @if (gift.is_purchased) {
+          <div class="purchased-overlay">✅</div>
+        }
 
         <div class="badges-wrapper">
           <div class="badge year-badge">
@@ -197,6 +209,13 @@
         }
       </div>
 
+      <div class="detail-item full-width">
+        <label>Statut</label>
+        <button class="btn-save" (click)="togglePurchased($event, gift)">
+          {{ gift.is_purchased ? '↩️ Marquer comme non acheté' : '✅ Marquer comme acheté' }}
+        </button>
+      </div>
+
       <div class="modal-actions">
         <button class="btn-cancel" (click)="closeDetailsModal()">Fermer</button>
         @if (gift.url) {
@@ -207,4 +226,28 @@
       </div>
     </div>
   }
+</dialog>
+
+<dialog #trashModal class="modal" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <h2>Corbeille</h2>
+
+    @if (deletedGifts().length === 0) {
+      <p>Aucun cadeau dans la corbeille.</p>
+    } @else {
+      @for (gift of deletedGifts(); track gift.id) {
+        <div class="trash-item">
+          <span class="name">{{ gift.title }}</span>
+          <div class="trash-actions">
+            <button class="btn-save" (click)="restoreGift(gift.id!)">Restaurer</button>
+            <button class="btn-cancel" (click)="permanentlyDeleteGift(gift.id!)">Supprimer déf.</button>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeTrash()">Fermer</button>
+    </div>
+  </div>
 </dialog>

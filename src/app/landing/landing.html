@@ -2,6 +2,7 @@
   <header>
     <h1>La Hotte de la Famille</h1>
     <p>Sélectionnez un profil pour voir sa liste</p>
+    <button class="btn-trash" (click)="openTrash()">🗑️ Corbeille</button>
   </header>
 
   @if (isLoading()) {
@@ -68,6 +69,30 @@
     <div class="modal-actions">
       <button class="btn-cancel" (click)="closeModal()">Annuler</button>
       <button class="btn-save" (click)="saveProfile()" [disabled]="email.invalid">Enregistrer</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog #trashModal class="modal" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <h2>Corbeille</h2>
+
+    @if (deletedMembers().length === 0) {
+      <p>Aucun profil dans la corbeille.</p>
+    } @else {
+      @for (member of deletedMembers(); track member.id) {
+        <div class="trash-item">
+          <span class="name">{{ member.name }}</span>
+          <div class="trash-actions">
+            <button class="btn-save" (click)="restoreMember(member.id)">Restaurer</button>
+            <button class="btn-cancel" (click)="permanentlyDeleteMember(member.id)">Supprimer déf.</button>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeTrash()">Fermer</button>
     </div>
   </div>
 </dialog>

@@ -4,4 +4,5 @@ export interface Member {
   mail: string;
   avatar_url: string;
   color?: string;
+  deleted_at?: string | null;
 }

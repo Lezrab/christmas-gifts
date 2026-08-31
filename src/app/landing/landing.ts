@@ -13,8 +13,10 @@ import { Member } from '../models/member/member';
 })
 export class LandingComponent implements OnInit {
   @ViewChild('profileModal') modal!: ElementRef<HTMLDialogElement>;
+  @ViewChild('trashModal') trashModal!: ElementRef<HTMLDialogElement>;
   // On utilise un signal pour une UI réactive
   familyMembers = signal<Member[]>([]);
+  deletedMembers = signal<Member[]>([]);
   isLoading = signal(true);
   // Objet tampon pour la modification
   selectedMember: Partial<Member> = { id: '', name: '', mail: '', avatar_url: '' };
@@ -73,7 +75,7 @@ export class LandingComponent implements OnInit {
   async deleteMember(event: Event, id: string) {
     event.stopPropagation();
 
-    const confirmDelete = confirm('Es-tu sûr de vouloir supprimer ce profil ?');
+    const confirmDelete = confirm('Envoyer ce profil à la corbeille ?');
     if (confirmDelete) {
       const error = await this.supabaseSvc.deleteProfile(id);
       if (!error) {
@@ -83,6 +85,44 @@ export class LandingComponent implements OnInit {
         alert('Erreur lors de la suppression');
       }
     }
+  }
+
+  async openTrash() {
+    try {
+      const deleted = await this.supabaseSvc.getDeletedProfiles();
+      this.deletedMembers.set(deleted);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors du chargement de la corbeille');
+      return;
+    }
+    this.trashModal.nativeElement.showModal();
+  }
+
+  closeTrash() {
+    this.trashModal.nativeElement.close();
+  }
+
+  async restoreMember(id: string) {
+    const error = await this.supabaseSvc.restoreProfile(id);
+    if (error) {
+      alert('Erreur lors de la restauration');
+      return;
+    }
+    this.deletedMembers.update((members) => members.filter((m) => m.id !== id));
+    await this.fetchMembers();
+  }
+
+  async permanentlyDeleteMember(id: string) {
+    const confirmDelete = confirm('Supprimer définitivement ce profil ? Cette action est irréversible.');
+    if (!confirmDelete) return;
+
+    const error = await this.supabaseSvc.permanentlyDeleteProfile(id);
+    if (error) {
+      alert('Erreur lors de la suppression définitive');
+      return;
+    }
+    this.deletedMembers.update((members) => members.filter((m) => m.id !== id));
   }
 
   async editMember(event: Event, member: Member) {
@@ -133,7 +173,7 @@ export class LandingComponent implements OnInit {
     // Si l'élément cliqué est le dialog lui-même (et non ses enfants comme la div modal-content)
     // cela signifie qu'on a cliqué sur le "backdrop" (le fond sombre)
     if (dialogElement.tagName === 'DIALOG') {
-      this.closeModal();
+      dialogElement.close();
     }
   }
 

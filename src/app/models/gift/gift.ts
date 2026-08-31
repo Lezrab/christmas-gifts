@@ -10,4 +10,6 @@ export interface Gift {
   is_important: boolean;
   image_from_link_preview: boolean;
   reserved_by?: string | null; // Nom de la personne qui a réservé le cadeau
+  is_purchased?: boolean; // Marqué comme acheté
+  deleted_at?: string | null; // Suppression douce (corbeille)
 }
