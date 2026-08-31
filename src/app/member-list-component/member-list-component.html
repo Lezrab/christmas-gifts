@@ -56,9 +56,6 @@
             (click)="togglePurchased($event, gift)">
             {{ gift.is_purchased ? '✓ Trouvé' : 'Trouvé ?' }}
           </button>
-          <div class="badge year-badge">
-            <span>📅</span> {{ getYear(gift.created_at) }}
-          </div>
           @if (gift.reserved_by) {
             <div class="badge reserved-badge">
               <span>🎁</span> Réservé

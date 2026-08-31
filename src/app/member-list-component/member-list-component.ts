@@ -350,11 +350,6 @@ export class MemberListComponent implements OnInit {
     }
   }
 
-  getYear(dateString: string | undefined): string {
-    if (!dateString) return new Date().getFullYear().toString();
-    return new Date(dateString).getFullYear().toString();
-  }
-
   formatDateFr(dateString: string): string {
     if (!dateString) return '';
 

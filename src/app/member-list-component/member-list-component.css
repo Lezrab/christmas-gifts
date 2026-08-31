@@ -555,11 +555,6 @@
 }
 
 /* Badge Année */
-.year-badge {
-  background: var(--color-teal-soft);
-  color: #3e5157;
-}
-
 /* Badge Réservé */
 .reserved-badge {
   background: var(--color-accent);
