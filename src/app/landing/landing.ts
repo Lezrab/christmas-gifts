@@ -20,7 +20,7 @@ export class LandingComponent implements OnInit {
   deletedMembers = signal<Member[]>([]);
   isLoading = signal(true);
   // Objet tampon pour la création/modification
-  selectedMember: Partial<Member> = { id: '', name: '', mail: '', avatar_url: '' };
+  selectedMember: Partial<Member> = { id: '', name: '', avatar_url: '' };
   private toastSvc = inject(Toast);
 
   // Palette d'avatars par défaut
@@ -58,7 +58,7 @@ export class LandingComponent implements OnInit {
   }
 
   openAddModal() {
-    this.selectedMember = { id: '', name: '', mail: '', avatar_url: '' };
+    this.selectedMember = { id: '', name: '', avatar_url: '' };
     this.modal.nativeElement.showModal();
   }
 
@@ -144,7 +144,6 @@ export class LandingComponent implements OnInit {
       if (this.selectedMember.id) {
         const { error } = await this.supabaseSvc.updateProfile(this.selectedMember.id, {
           name,
-          mail: this.selectedMember.mail,
           avatar_url: this.selectedMember.avatar_url,
         });
         if (error) throw error;

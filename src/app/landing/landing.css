@@ -319,7 +319,7 @@
   box-shadow: 0 6px 20px rgba(91, 124, 130, 0.4);
 }
 
-/* Désactivé (si l'email est invalide par exemple) */
+/* Désactivé (si le prénom est vide) */
 .btn-save:disabled {
   background: #aab0b3;
   border-color: #aab0b3;

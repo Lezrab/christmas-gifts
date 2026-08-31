@@ -31,8 +31,8 @@ describe('Landing', () => {
   };
 
   const members: Member[] = [
-    { id: '1', name: 'Alice', mail: '', avatar_url: '' },
-    { id: '2', name: 'Bob', mail: '', avatar_url: '' },
+    { id: '1', name: 'Alice', avatar_url: '' },
+    { id: '2', name: 'Bob', avatar_url: '' },
   ];
 
   beforeEach(async () => {
@@ -66,11 +66,11 @@ describe('Landing', () => {
   });
 
   it('opens the profile modal with an empty buffer for a new profile', () => {
-    component.selectedMember = { id: '1', name: 'Alice', mail: '', avatar_url: '' };
+    component.selectedMember = { id: '1', name: 'Alice', avatar_url: '' };
 
     component.openAddModal();
 
-    expect(component.selectedMember).toEqual({ id: '', name: '', mail: '', avatar_url: '' });
+    expect(component.selectedMember).toEqual({ id: '', name: '', avatar_url: '' });
   });
 
   it('adds a new profile and refreshes the list', async () => {
