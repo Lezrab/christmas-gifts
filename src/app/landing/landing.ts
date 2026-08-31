@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core'
 import { Supabase } from '../services/supabase';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {Member} from "../models/member/member";
+import { Member } from '../models/member/member';
 
 @Component({
   selector: 'app-landing',
@@ -14,9 +14,10 @@ import {Member} from "../models/member/member";
 export class LandingComponent implements OnInit {
   @ViewChild('profileModal') modal!: ElementRef<HTMLDialogElement>;
   // On utilise un signal pour une UI réactive
-  familyMembers = signal<any[]>([]);
+  familyMembers = signal<Member[]>([]);
+  isLoading = signal(true);
   // Objet tampon pour la modification
-  selectedMember: any = { id: '', name: '', mail: '', avatar_url: '' };
+  selectedMember: Partial<Member> = { id: '', name: '', mail: '', avatar_url: '' };
 
   // Liste de couleurs festives
   private festiveColors = [
@@ -40,15 +41,28 @@ export class LandingComponent implements OnInit {
   }
 
   async fetchMembers() {
-    const members = await this.supabaseSvc.getProfiles();
-    this.familyMembers.set(members);
+    this.isLoading.set(true);
+    try {
+      const members = await this.supabaseSvc.getProfiles();
+      this.familyMembers.set(members);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors du chargement des profils');
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   async openAddModal() {
     const newName = prompt('Nom du nouveau membre ?');
     if (newName) {
-      await this.supabaseSvc.addProfile(newName);
-      await this.fetchMembers(); // Rafraîchit la liste
+      try {
+        await this.supabaseSvc.addProfile(newName);
+        await this.fetchMembers(); // Rafraîchit la liste
+      } catch (err) {
+        console.error(err);
+        alert("Erreur lors de l'ajout du profil");
+      }
     }
   }
 
@@ -71,7 +85,7 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  async editMember(event: Event, member: any) {
+  async editMember(event: Event, member: Member) {
     event.stopPropagation();
     // On crée une copie pour ne pas modifier l'original en direct
     this.selectedMember = { ...member };
@@ -83,6 +97,8 @@ export class LandingComponent implements OnInit {
   }
 
   async saveProfile() {
+    if (!this.selectedMember.id) return;
+
     const { error } = await this.supabaseSvc.updateProfile(this.selectedMember.id, {
       name: this.selectedMember.name,
       mail: this.selectedMember.mail,
@@ -97,8 +113,9 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
+  async onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (file) {
       try {
         const publicUrl = await this.supabaseSvc.uploadAvatar(file);
@@ -120,8 +137,14 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  getRandomColor(): string {
-    const randomIndex = Math.floor(Math.random() * this.festiveColors.length);
-    return this.festiveColors[randomIndex];
+  // Couleur stable par membre : dérivée de son id, pas recalculée à chaque
+  // cycle de détection de changement (sinon elle "clignote" à l'écran).
+  getAvatarColor(member: Member): string {
+    let hash = 0;
+    for (let i = 0; i < member.id.length; i++) {
+      hash = member.id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % this.festiveColors.length;
+    return this.festiveColors[index];
   }
 }

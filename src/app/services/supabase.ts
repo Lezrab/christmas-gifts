@@ -15,11 +15,13 @@ export class Supabase {
 
   async getProfiles() {
     const { data, error } = await this.supabase.from('profiles').select('*').order('name');
+    if (error) throw error;
     return data || [];
   }
 
   async addProfile(name: string) {
     const { data, error } = await this.supabase.from('profiles').insert([{ name }]).select();
+    if (error) throw error;
     return data;
   }
 
@@ -37,10 +39,13 @@ export class Supabase {
     return { data, error };
   }
 
-  async uploadAvatar(file: File) {
+  private generateFileName(file: File): string {
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `public/${fileName}`;
+    return `${Math.random()}-${Date.now()}.${fileExt}`;
+  }
+
+  async uploadAvatar(file: File) {
+    const filePath = `public/${this.generateFileName(file)}`;
 
     const { error } = await this.supabase.storage.from('avatars').upload(filePath, file);
 
@@ -53,7 +58,8 @@ export class Supabase {
   }
 
   async getProfileById(id: string) {
-    const { data } = await this.supabase.from('profiles').select('*').eq('id', id).single();
+    const { data, error } = await this.supabase.from('profiles').select('*').eq('id', id).single();
+    if (error) throw error;
     return data;
   }
 
@@ -88,8 +94,7 @@ export class Supabase {
   }
 
   async uploadGiftImage(file: File): Promise<string> {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}-${Date.now()}.${fileExt}`;
+    const fileName = this.generateFileName(file);
 
     const { error: uploadError } = await this.supabase.storage
       .from('human_image_url')
@@ -100,5 +105,14 @@ export class Supabase {
     const { data } = this.supabase.storage.from('human_image_url').getPublicUrl(fileName);
 
     return data.publicUrl;
+  }
+
+  async reserveGift(id: string, reservedBy: string | null) {
+    const { data, error } = await this.supabase
+      .from('gifts')
+      .update({ reserved_by: reservedBy })
+      .eq('id', id)
+      .select();
+    return { data, error };
   }
 }

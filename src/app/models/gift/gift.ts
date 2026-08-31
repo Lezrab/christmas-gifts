@@ -9,4 +9,5 @@ export interface Gift {
   image_url: string;
   is_important: boolean;
   image_from_link_preview: boolean;
+  reserved_by?: string | null; // Nom de la personne qui a réservé le cadeau
 }

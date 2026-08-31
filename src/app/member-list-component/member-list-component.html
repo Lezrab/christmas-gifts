@@ -38,6 +38,11 @@
               <span>⭐</span>
             </div>
           }
+          @if (gift.reserved_by) {
+            <div class="badge reserved-badge">
+              <span>🎁</span> Réservé
+            </div>
+          }
         </div>
 
         <div class="gift-image-preview">
@@ -52,8 +57,8 @@
         </div>
 
         <div class="card-actions" (click)="$event.stopPropagation()">
-          <button class="edit-btn" (click)="openGiftUpdateModal(gift)">&#8942;</button>
-          <button class="delete-btn" (click)="deleteGift($event, gift.id)">&times;</button>
+          <button class="edit-btn" aria-label="Modifier le cadeau" (click)="openGiftUpdateModal(gift)">&#8942;</button>
+          <button class="delete-btn" aria-label="Supprimer le cadeau" (click)="deleteGift($event, gift.id!)">&times;</button>
         </div>
 
         <div class="gift-info">
@@ -74,9 +79,9 @@
   </div>
 </div>
 
-<dialog #giftModal class="modal">
+<dialog #giftModal class="modal" (click)="onBackdropClick($event)">
   <div class="modal-content">
-    <h2>Nouvelle Idée Cadeau 🎁</h2>
+    <h2>{{ newGift.id ? 'Modifier Idée Cadeau 🎁' : 'Nouvelle Idée Cadeau 🎁' }}</h2>
 
     <div class="image-preview-wrapper" [class.loading]="isUploading()">
       @if (isUploading()) {
@@ -99,7 +104,7 @@
 
     <div class="form-group file-input-group">
       <label for="file-upload" class="custom-file-upload">
-        {{ selectedFile ? '✅ Image prête' : '➕ Ajouter une photo' }}
+        {{ newGift.image_url ? '➕ Changer la photo' : '➕ Ajouter une photo' }}
       </label>
       <input id="file-upload" type="file" (change)="onFileSelected($event)" accept="image/*">
     </div>
@@ -146,124 +151,60 @@
     <div class="modal-actions">
       <button class="btn-cancel" (click)="closeGiftModal()">Annuler</button>
       <button class="btn-save" (click)="saveGift()">
-        Ajouter à la hotte
-      </button>
-    </div>
-  </div>
-</dialog>
-<dialog #giftUpdateModal class="modal">
-  <div class="modal-content">
-    <h2>Modifier Idée Cadeau 🎁</h2>
-
-    <div class="image-preview-wrapper" [class.loading]="isUploading()">
-      @if (isUploading()) {
-        <div class="loader-container">
-          <div class="spinner"></div>
-          <p>Envoi de l'image...</p>
-        </div>
-      } @else {
-        @if (newGift.image_url) {
-          <img [src]="newGift.image_url" alt="Aperçu du cadeau">
-          <button class="remove-img-btn" (click)="newGift.image_url = ''">×</button>
-        } @else {
-          <div class="no-image-placeholder">
-            <span>📸</span>
-            <p>Aucune image</p>
-          </div>
-        }
-      }
-    </div>
-
-    <div class="form-group file-input-group">
-      <label for="file-upload" class="custom-file-upload">
-        {{ newGift.image_url != '' ? '➕ Changer la photo' : '➕ Ajouter une photo' }}
-      </label>
-      <input id="file-upload" type="file" (change)="onFileSelected($event)" accept="image/*">
-    </div>
-
-    <div class="form-group">
-      <label>Titre</label>
-      <input type="text" [(ngModel)]="newGift.title" placeholder="Ex: Gants en laine" required>
-    </div>
-
-    <div class="form-group">
-      <label>Commentaire</label>
-      <textarea [(ngModel)]="newGift.comment" placeholder="Taille, couleur, précisions..."></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>Prix (€)</label>
-      <input type="number" [(ngModel)]="newGift.price" placeholder="0.00">
-    </div>
-
-    <div class="form-group">
-      <label>Lien internet (URL)</label>
-      <div class="input-wrapper">
-        <input
-          type="url"
-          [(ngModel)]="newGift.url"
-          (blur)="onUrlPaste()"
-          placeholder="https://...">
-
-        @if (isSearching()) {
-          <div class="loader"></div>
-        }
-
-        @if (!isSearching() && newGift.image_url) {
-          <span class="success-icon">✨</span>
-        }
-      </div>
-
-      <div class="form-group priority-group">
-        <input type="checkbox" id="important" [(ngModel)]="newGift.is_important">
-        <label for="important">C'EST UN CADEAU FAVORI ✨</label>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" (click)="closeGiftUpdateModal()">Annuler</button>
-      <button class="btn-save" (click)="saveGift()">
-        Modifier
+        {{ newGift.id ? 'Modifier' : 'Ajouter à la hotte' }}
       </button>
     </div>
   </div>
 </dialog>
 <dialog #detailsModal class="modal details-view" (click)="onBackdropClick($event)">
-  <div class="modal-content">
-    @if (selectedGift()?.image_url) {
-      <div class="details-image-container">
-        <img [src]="selectedGift()?.image_url" alt="Aperçu du cadeau">
-      </div>
-    }
-
-    <h2>{{ selectedGift()?.title }}</h2>
-
-    <div class="details-info-grid">
-      @if (selectedGift()?.price) {
-        <div class="detail-item">
-          <label>Prix (€)</label>
-          <span class="price-value">{{ selectedGift()?.price }}€</span>
+  @if (selectedGift(); as gift) {
+    <div class="modal-content">
+      @if (gift.image_url) {
+        <div class="details-image-container">
+          <img [src]="gift.image_url" alt="Aperçu du cadeau">
         </div>
       }
-    </div>
 
-    <div class="detail-item full-width">
-      <label>Commentaire</label>
-      <p class="comment-text">{{ selectedGift()?.comment || 'Aucun détail supplémentaire.' }}</p>
-    </div>
+      <h2>{{ gift.title }}</h2>
 
-    <div class="detail-item full-width">
-      <label>Ajouté le</label>
-      <p class="comment-text">{{ formatDateFr(selectedGift()?.created_at) }}</p>
-    </div>
+      <div class="details-info-grid">
+        @if (gift.price) {
+          <div class="detail-item">
+            <label>Prix (€)</label>
+            <span class="price-value">{{ gift.price }}€</span>
+          </div>
+        }
+      </div>
 
-    <div class="modal-actions">
-      <button class="btn-cancel" (click)="closeDetailsModal()">Fermer</button>
-      @if (selectedGift()?.url) {
-        <a [href]="selectedGift()?.url" target="_blank" class="btn-save">
-          Voir sur le site →
-        </a>
-      }
+      <div class="detail-item full-width">
+        <label>Commentaire</label>
+        <p class="comment-text">{{ gift.comment || 'Aucun détail supplémentaire.' }}</p>
+      </div>
+
+      <div class="detail-item full-width">
+        <label>Ajouté le</label>
+        <p class="comment-text">{{ formatDateFr(gift.created_at) }}</p>
+      </div>
+
+      <div class="detail-item full-width">
+        <label>Réservation</label>
+        @if (gift.reserved_by) {
+          <p class="comment-text">Réservé par {{ gift.reserved_by }}
+            <button class="btn-cancel" (click)="releaseGift($event, gift)">Libérer</button>
+          </p>
+        } @else {
+          <button class="btn-save" (click)="reserveGift($event, gift)">Je m'en occupe 🎁</button>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeDetailsModal()">Fermer</button>
+        @if (gift.url) {
+          <a [href]="gift.url" target="_blank" class="btn-save">
+            Voir sur le site →
+          </a>
+        }
+      </div>
     </div>
-  </div>
+  }
 </dialog>

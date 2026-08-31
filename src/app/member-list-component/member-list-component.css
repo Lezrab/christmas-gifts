@@ -429,6 +429,11 @@
   background: #1a3a6d;
 }
 
+/* Badge Réservé (Vert sapin) */
+.reserved-badge {
+  background: #095228;
+}
+
 /* Ajustement pour les boutons d'actions */
 .gift-card .card-actions {
   top: 42px; /* On descend un peu les boutons pour ne pas gêner les badges */

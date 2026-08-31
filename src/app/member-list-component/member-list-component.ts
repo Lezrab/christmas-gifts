@@ -17,15 +17,13 @@ export class MemberListComponent implements OnInit {
   memberId = '';
   memberName = signal('');
   gifts = signal<Gift[]>([]);
-  selectedGift = signal<any>(null);
+  selectedGift = signal<Gift | null>(null);
   @ViewChild('giftModal') giftModal!: ElementRef<HTMLDialogElement>;
-  @ViewChild('giftUpdateModal') giftUpdateModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('detailsModal') detailsModal!: ElementRef<HTMLDialogElement>;
   private titleService = inject(Title);
-  selectedFile: File | null = null;
   isUploading = signal(false);
 
-  // Objet tampon pour le nouveau cadeau
+  // Objet tampon pour le nouveau cadeau (ou celui en cours de modification)
   newGift: Partial<Gift> = {
     title: '',
     comment: '',
@@ -79,20 +77,22 @@ export class MemberListComponent implements OnInit {
   }
 
   getTitreHotte(name: string) {
+    if (!name) return 'La hotte 🎄';
     const voyelles = 'AEIOUÀÂÉÈÊËÎÏÔÛÙH';
     const elision = voyelles.includes(name[0].toUpperCase());
     return `La hotte ${elision ? "d'" : 'de '}${name} 🎄`;
   }
 
   async loadMemberData() {
-    // On récupère le profil pour avoir le nom
-    const profile = await this.supabaseSvc.getProfileById(this.memberId);
-    this.memberName.set(profile?.name || 'Inconnu');
-    this.titleService.setTitle(this.getTitreHotte(this.memberName()));
+    try {
+      // On récupère le profil pour avoir le nom
+      const profile = await this.supabaseSvc.getProfileById(this.memberId);
+      this.memberName.set(profile?.name || 'Inconnu');
+      this.titleService.setTitle(this.getTitreHotte(this.memberName()));
 
-    // On récupère les cadeaux liés à ce membre
-    const data = await this.supabaseSvc.getGiftsByMember(this.memberId);
-    if (data) {
+      // On récupère les cadeaux liés à ce membre
+      const data = await this.supabaseSvc.getGiftsByMember(this.memberId);
+
       // Tri : Important d'abord, puis par titre
       const sortedGifts = data.sort((a, b) => {
         if (a.is_important === b.is_important) {
@@ -101,8 +101,10 @@ export class MemberListComponent implements OnInit {
         return a.is_important ? -1 : 1;
       });
       this.gifts.set(sortedGifts);
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors du chargement des données');
     }
-    this.gifts.set(data);
   }
 
   goBack() {
@@ -121,21 +123,17 @@ export class MemberListComponent implements OnInit {
     this.giftModal.nativeElement.showModal();
   }
 
+  openGiftUpdateModal(gift: Gift) {
+    this.newGift = { ...gift };
+    this.giftModal.nativeElement.showModal();
+  }
+
   closeGiftModal() {
     this.giftModal.nativeElement.close();
-  }
-
-  openGiftUpdateModal(gift: any) {
-    this.newGift = { ...gift };
-    this.giftUpdateModal.nativeElement.showModal();
-  }
-
-  closeGiftUpdateModal() {
-    this.giftUpdateModal.nativeElement.close();
     this.newGift = {};
   }
 
-  openDetailsModal(gift: any) {
+  openDetailsModal(gift: Gift) {
     this.selectedGift.set(gift);
     this.detailsModal.nativeElement.showModal();
   }
@@ -164,14 +162,13 @@ export class MemberListComponent implements OnInit {
       if (this.newGift.id) {
         // MODIFICATION
         await this.supabaseSvc.updateGift(this.newGift.id, giftData);
-        this.closeGiftUpdateModal();
       } else {
         // AJOUT
         // On s'assure que member_id est présent pour le nouvel objet
         const newObject = { ...giftData, member_id: this.memberId };
         await this.supabaseSvc.addGift(newObject);
-        this.closeGiftModal();
       }
+      this.closeGiftModal();
       await this.loadMemberData(); // Rafraîchit la liste dans tous les cas
     } catch (err) {
       console.error(err);
@@ -183,14 +180,49 @@ export class MemberListComponent implements OnInit {
     if ((event.target as HTMLElement).tagName === 'DIALOG') {
       this.closeGiftModal();
       this.closeDetailsModal();
-      this.closeGiftUpdateModal();
     }
   }
 
-  async deleteGift(event: Event, id: any) {
+  async deleteGift(event: Event, id: string) {
     event.stopPropagation(); // Empêche de déclencher d'autres clics
-    await this.supabaseSvc.deleteGift(id); // À ajouter dans ton service
+    await this.supabaseSvc.deleteGift(id);
     this.gifts.update((current) => current.filter((g) => g.id !== id));
+  }
+
+  async reserveGift(event: Event, gift: Gift) {
+    event.stopPropagation();
+    if (!gift.id) return;
+
+    const name = prompt("Ton prénom, pour indiquer que tu t'en occupes ?");
+    if (!name) return;
+
+    const { error } = await this.supabaseSvc.reserveGift(gift.id, name);
+    if (error) {
+      alert('Erreur lors de la réservation');
+      return;
+    }
+    this.applyReservation(gift.id, name);
+  }
+
+  async releaseGift(event: Event, gift: Gift) {
+    event.stopPropagation();
+    if (!gift.id) return;
+
+    const { error } = await this.supabaseSvc.reserveGift(gift.id, null);
+    if (error) {
+      alert('Erreur lors de la libération du cadeau');
+      return;
+    }
+    this.applyReservation(gift.id, null);
+  }
+
+  private applyReservation(giftId: string, reservedBy: string | null) {
+    this.gifts.update((current) =>
+      current.map((g) => (g.id === giftId ? { ...g, reserved_by: reservedBy } : g)),
+    );
+    if (this.selectedGift()?.id === giftId) {
+      this.selectedGift.update((g) => (g ? { ...g, reserved_by: reservedBy } : g));
+    }
   }
 
   // Dans ta classe MemberListComponent
@@ -276,8 +308,9 @@ export class MemberListComponent implements OnInit {
     }
   }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
+  async onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
 
     try {
