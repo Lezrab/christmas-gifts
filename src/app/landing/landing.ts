@@ -21,16 +21,16 @@ export class LandingComponent implements OnInit {
   // Objet tampon pour la modification
   selectedMember: Partial<Member> = { id: '', name: '', mail: '', avatar_url: '' };
 
-  // Liste de couleurs festives
-  private festiveColors = [
-    '#d42426',
-    '#095228',
-    '#1a3a6d',
-    '#b8860b',
-    '#7b1315',
-    '#2d5a27',
-    '#cf1124',
-    '#043927',
+  // Palette d'avatars par défaut
+  private avatarColors = [
+    '#c1666b',
+    '#5b7c82',
+    '#d9a441',
+    '#8a7ca8',
+    '#4c6b70',
+    '#a34e53',
+    '#7a8fa6',
+    '#b8894a',
   ];
 
   constructor(
@@ -184,7 +184,7 @@ export class LandingComponent implements OnInit {
     for (let i = 0; i < member.id.length; i++) {
       hash = member.id.charCodeAt(i) + ((hash << 5) - hash);
     }
-    const index = Math.abs(hash) % this.festiveColors.length;
-    return this.festiveColors[index];
+    const index = Math.abs(hash) % this.avatarColors.length;
+    return this.avatarColors[index];
   }
 }

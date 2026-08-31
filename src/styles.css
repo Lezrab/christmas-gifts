@@ -1,58 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Mountains+of+Christmas:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Karla:wght@400;500;700&display=swap');
 
 :root {
-  /* On définit les polices comme variables */
-  --font-title: 'Mountains of Christmas', cursive;
-  --font-body: 'Montserrat', sans-serif;
+  --font-title: 'Schibsted Grotesk', sans-serif;
+  --font-body: 'Karla', sans-serif;
+
+  --color-bg: #eef1f3;
+  --color-surface: #ffffff;
+  --color-ink: #2e3440;
+  --color-muted: #5a6672;
+  --color-line: #d7e0e3;
+
+  --color-accent: #c1666b; /* rose poudré — actions principales */
+  --color-accent-dark: #a34e53;
+  --color-accent-soft: #f3dfe1;
+  --color-teal: #5b7c82; /* accent secondaire */
+  --color-teal-soft: #d9e4e6;
+  --color-mustard: #d9a441; /* favoris */
 }
 
 body {
   font-family: var(--font-body);
-  background-color: #f8f9fa;
-  color: #2c3e50;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
   margin: 0;
-}
-
-body::before {
-  content: "❄ ❅ ❆ ❄ ❆ ❅ ❄ ❅ ❆";
-  position: fixed;
-  top: -10vh;
-  left: 0;
-  width: 100%;
-  height: 110vh;
-  pointer-events: none;
-  z-index: 1;
-  /* Création d'une grille de flocons avec des tailles variées */
-  font-size: 24px;
-  color: white;
-  opacity: 0.6;
-  white-space: pre-wrap;
-  word-spacing: 150px;
-  line-height: 200px;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-  /* Animation de chute */
-  animation: snow-fall 12s linear infinite;
-}
-
-@keyframes snow-fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-  }
-  100% {
-    transform: translateY(100vh) rotate(20deg); /* Légère rotation en tombant */
-  }
 }
 
 h1, h2, h3 {
   font-family: var(--font-title);
-  color: #d42426; /* Rouge Noël */
+  font-weight: 700;
+  color: var(--color-ink);
 }
 
 /* On applique la police de titre à nos noms sur les cartes */
 .name {
-  font-family: var(--font-body);
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-family: var(--font-title);
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 textarea {

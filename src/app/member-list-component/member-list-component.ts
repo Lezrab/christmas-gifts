@@ -78,11 +78,9 @@ export class MemberListComponent implements OnInit {
     }
   }
 
-  getTitreHotte(name: string) {
-    if (!name) return 'La hotte 🎄';
-    const voyelles = 'AEIOUÀÂÉÈÊËÎÏÔÛÙH';
-    const elision = voyelles.includes(name[0].toUpperCase());
-    return `La hotte ${elision ? "d'" : 'de '}${name} 🎄`;
+  getListTitle(name: string) {
+    if (!name) return 'Idées cadeaux';
+    return `Idées cadeaux pour ${name}`;
   }
 
   async loadMemberData() {
@@ -90,7 +88,7 @@ export class MemberListComponent implements OnInit {
       // On récupère le profil pour avoir le nom
       const profile = await this.supabaseSvc.getProfileById(this.memberId);
       this.memberName.set(profile?.name || 'Inconnu');
-      this.titleService.setTitle(this.getTitreHotte(this.memberName()));
+      this.titleService.setTitle(this.getListTitle(this.memberName()));
 
       // On récupère les cadeaux liés à ce membre
       const data = await this.supabaseSvc.getGiftsByMember(this.memberId);
@@ -411,6 +409,6 @@ export class MemberListComponent implements OnInit {
 
   ngOnDestroy() {
     // Remet le titre d'origine de ton app
-    this.titleService.setTitle('Mon App Cadeaux 🎁');
+    this.titleService.setTitle('Idées Cadeaux');
   }
 }

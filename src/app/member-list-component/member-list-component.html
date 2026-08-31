@@ -3,7 +3,7 @@
     <button class="btn-save" (click)="goBack()">
       <span>←</span> Retour
     </button>
-    <h1>{{ getTitreHotte(memberName()) }}</h1>
+    <h1>{{ getListTitle(memberName()) }}</h1>
     <div class="header-actions">
       <button class="btn-icon-text" (click)="printList()">🖨️ Imprimer</button>
       <button class="btn-icon-text" (click)="openTrash()">🗑️ Corbeille</button>
@@ -37,10 +37,6 @@
         [class.important]="gift.is_important"
         [class.purchased]="gift.is_purchased">
 
-        @if (gift.is_purchased) {
-          <div class="purchased-overlay">✅</div>
-        }
-
         <div class="badges-wrapper">
           <div class="badge year-badge">
             <span>📅</span> {{ getYear(gift.created_at) }}
@@ -58,6 +54,9 @@
         </div>
 
         <div class="gift-image-preview">
+          @if (gift.is_purchased) {
+            <div class="purchased-tag">Trouvé ✓</div>
+          }
           @if (gift.image_url) {
             <img [src]="gift.image_url" alt="Aperçu du cadeau">
           } @else {
@@ -163,7 +162,7 @@
     <div class="modal-actions">
       <button class="btn-cancel" (click)="closeGiftModal()">Annuler</button>
       <button class="btn-save" (click)="saveGift()">
-        {{ newGift.id ? 'Modifier' : 'Ajouter à la hotte' }}
+        {{ newGift.id ? 'Modifier' : 'Ajouter à la liste' }}
       </button>
     </div>
   </div>
@@ -212,7 +211,7 @@
       <div class="detail-item full-width">
         <label>Statut</label>
         <button class="btn-save" (click)="togglePurchased($event, gift)">
-          {{ gift.is_purchased ? '↩️ Marquer comme non acheté' : '✅ Marquer comme acheté' }}
+          {{ gift.is_purchased ? '↩️ Marquer comme non trouvé' : '✅ Marquer comme trouvé' }}
         </button>
       </div>
 

@@ -8,18 +8,19 @@
 .btn-trash {
   margin-top: 15px;
   background: none;
-  border: 1px solid #ccc;
+  border: 1.5px dashed var(--color-line);
   border-radius: 20px;
   padding: 6px 16px;
-  color: #666;
+  color: var(--color-muted);
   cursor: pointer;
   font-size: 0.85rem;
+  font-family: var(--font-body);
   transition: all 0.2s;
 }
 
 .btn-trash:hover {
-  border-color: #d42426;
-  color: #d42426;
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
 }
 
 .trash-item {
@@ -28,7 +29,7 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-line);
   text-align: left;
 }
 
@@ -49,14 +50,14 @@
   align-items: center;
   gap: 10px;
   margin-top: 60px;
-  color: #1a3a6d;
+  color: var(--color-teal);
 }
 
 .spinner {
   width: 30px;
   height: 30px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #1a3a6d;
+  border: 4px solid var(--color-teal-soft);
+  border-top: 4px solid var(--color-teal);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -80,20 +81,21 @@
   aspect-ratio: auto;
   min-height: 350px;
   padding: 20px;
-  background: white;
-  border-radius: 20px;
-  border: 1px solid #ddd;
+  background: var(--color-surface);
+  border-radius: 18px;
+  border: 1px solid var(--color-line);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(46, 52, 64, 0.06);
 }
 
 .card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(46, 52, 64, 0.1);
 }
 
 .card-actions {
@@ -106,7 +108,7 @@
 
 /* Style spécifique profil */
 .profile {
-  background: #fdfdfd;
+  background: var(--color-surface);
   position: relative;
 }
 
@@ -116,6 +118,7 @@
   color: white;
   font-size: 80px; /* On augmente massivement la taille de la lettre */
   font-weight: bold;
+  font-family: var(--font-title);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -138,33 +141,33 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #eee;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border: 4px solid var(--color-line);
+  box-shadow: 0 8px 16px rgba(46, 52, 64, 0.1);
 }
 
 /* Style bouton ajouter */
 .add-card {
-  border: 3px dashed #d42426; /* Pointillés rouges */
-  background: #fff5f5; /* Fond très légèrement rosé */
-  color: #d42426; /* Texte rouge */
+  border: 2px dashed var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-dark);
   transition: all 0.3s ease;
 }
 
 .add-card:hover {
-  border-style: solid; /* Devient ligne pleine */
-  background: white;
-  transform: translateY(-5px); /* S'élève */
-  box-shadow: 0 10px 20px rgba(212, 36, 38, 0.2); /* Ombre rouge */
+  border-style: solid;
+  background: var(--color-surface);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(193, 102, 107, 0.2);
 }
 
 .add-card .icon-plus {
   font-size: 50px;
-  color: #d42426; /* Plus rouge */
+  color: var(--color-accent);
   margin-bottom: 10px;
 }
 
 .add-card .name {
-  color: #d42426;
+  color: var(--color-accent-dark);
   font-weight: bold;
 }
 
@@ -174,17 +177,15 @@
 }
 
 .name {
-  font-family: var(--font-body);
   font-size: 1.2rem; /* On grossit un peu le nom pour équilibrer avec l'image */
-  font-weight: 500;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .delete-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(46, 52, 64, 0.06);
   border: none;
   border-radius: 50%;
   width: 24px;
@@ -193,7 +194,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #666;
+  color: var(--color-muted);
   font-size: 18px;
   line-height: 1;
   transition: all 0.2s;
@@ -203,7 +204,7 @@
   position: absolute;
   top: 8px;
   right: 36px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(46, 52, 64, 0.06);
   border: none;
   border-radius: 50%;
   width: 24px;
@@ -212,20 +213,20 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #666;
+  color: var(--color-muted);
   font-size: 18px;
   line-height: 1;
   transition: all 0.2s;
 }
 
 .edit-btn:hover {
-  background: #095228; /* Vert Noël au survol */
+  background: var(--color-teal);
   color: white;
   transform: scale(1.1);
 }
 
 .delete-btn:hover {
-  background: #d42426; /* Rouge Noël au survol */
+  background: var(--color-accent);
   color: white;
   transform: scale(1.1);
 }
@@ -237,11 +238,11 @@
   padding: 0;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(46, 52, 64, 0.15);
 }
 
 .modal::backdrop {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(46, 52, 64, 0.45);
   backdrop-filter: blur(3px);
 }
 
@@ -261,9 +262,10 @@
 
 .form-group input {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-line);
   border-radius: 8px;
   font-size: 16px;
+  font-family: var(--font-body);
 }
 
 /* --- Boutons dans la Modale (Annuler / Enregistrer) --- */
@@ -282,44 +284,44 @@
   border-radius: 30px; /* Très arrondi */
   font-size: 16px;
   font-weight: 600;
+  font-family: var(--font-body);
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase; /* Lettres capitales */
-  letter-spacing: 1px;
+  letter-spacing: 0.3px;
 }
 
-/* Bouton Annuler (Style "Sucre d'Orge" discret) */
+/* Bouton Annuler (discret) */
 .btn-cancel {
-  background: white;
-  color: #333;
-  border: 2px solid #ddd;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  border: 2px solid var(--color-line);
 }
 
 .btn-cancel:hover {
   background: #f8f8f8;
-  border-color: #d42426; /* Devient rouge au survol */
-  color: #d42426;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
+  box-shadow: 0 4px 10px rgba(46, 52, 64, 0.08);
 }
 
-/* Bouton Enregistrer (Style "Cadeau" Doré/Vert) */
+/* Bouton Enregistrer */
 .btn-save {
-  background: #095228; /* Vert sapin */
+  background: var(--color-teal);
   color: white;
-  border: 2px solid #095228;
-  box-shadow: 0 4px 15px rgba(9, 82, 40, 0.3); /* Ombre verte */
+  border: 2px solid var(--color-teal);
+  box-shadow: 0 4px 15px rgba(91, 124, 130, 0.3);
 }
 
 .btn-save:hover {
-  background: #0b6631; /* Vert un peu plus clair */
-  transform: scale(1.05); /* Grossit légèrement */
-  box-shadow: 0 6px 20px rgba(9, 82, 40, 0.4);
+  background: #4c6b70;
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(91, 124, 130, 0.4);
 }
 
 /* Désactivé (si l'email est invalide par exemple) */
 .btn-save:disabled {
-  background: #aab;
-  border-color: #aab;
+  background: #aab0b3;
+  border-color: #aab0b3;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
