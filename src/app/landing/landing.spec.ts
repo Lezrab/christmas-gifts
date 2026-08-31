@@ -3,12 +3,18 @@ import { provideRouter } from '@angular/router';
 
 import { LandingComponent } from './landing';
 import { Supabase } from '../services/supabase';
+import { Toast } from '../services/toast';
 import { Member } from '../models/member/member';
 
-// jsdom n'implémente pas showModal() sur <dialog>
+// jsdom n'implémente pas showModal()/close() sur <dialog>
 if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
     this.setAttribute('open', '');
+  };
+}
+if (!HTMLDialogElement.prototype.close) {
+  HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+    this.removeAttribute('open');
   };
 }
 
@@ -59,19 +65,28 @@ describe('Landing', () => {
     expect(component.isLoading()).toBe(false);
   });
 
-  it('adds a new profile from the prompt and refreshes the list', async () => {
-    vi.spyOn(window, 'prompt').mockReturnValue('Charlie');
+  it('opens the profile modal with an empty buffer for a new profile', () => {
+    component.selectedMember = { id: '1', name: 'Alice', mail: '', avatar_url: '' };
 
-    await component.openAddModal();
+    component.openAddModal();
 
-    expect(supabaseMock.addProfile).toHaveBeenCalledWith('Charlie');
+    expect(component.selectedMember).toEqual({ id: '', name: '', mail: '', avatar_url: '' });
+  });
+
+  it('adds a new profile and refreshes the list', async () => {
+    component.openAddModal();
+    component.selectedMember.name = 'Charlie';
+
+    await component.saveProfile();
+
+    expect(supabaseMock.addProfile).toHaveBeenCalledWith('Charlie', '');
     expect(supabaseMock.getProfiles).toHaveBeenCalledTimes(2);
   });
 
-  it('does not add a profile when the prompt is cancelled', async () => {
-    vi.spyOn(window, 'prompt').mockReturnValue(null);
+  it('does not save a profile without a name', async () => {
+    component.openAddModal();
 
-    await component.openAddModal();
+    await component.saveProfile();
 
     expect(supabaseMock.addProfile).not.toHaveBeenCalled();
   });
@@ -93,14 +108,13 @@ describe('Landing', () => {
     expect(colorA).toBe(colorB);
   });
 
-  it('shows an error and stops loading when fetching profiles fails', async () => {
+  it('shows an error toast and stops loading when fetching profiles fails', async () => {
     supabaseMock.getProfiles.mockRejectedValueOnce(new Error('network down'));
-    vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     await component.fetchMembers();
 
     expect(component.isLoading()).toBe(false);
-    expect(window.alert).toHaveBeenCalled();
+    expect(TestBed.inject(Toast).messages().some((m) => m.type === 'error')).toBe(true);
   });
 
   it('loads the deleted members when opening the trash', async () => {

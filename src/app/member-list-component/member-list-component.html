@@ -11,6 +11,13 @@
   </header>
 
   <div class="filter-container">
+    <input
+      type="search"
+      class="search-input"
+      placeholder="🔍 Rechercher un cadeau..."
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)">
+
     <span class="filter-label">Filtrer par année(s) :</span>
     <div class="year-buttons">
       @for (year of availableYears; track year) {
@@ -30,6 +37,18 @@
       <span class="add-text">Ajouter une idée</span>
     </div>
 
+    @if (gifts().length === 0) {
+      <div class="empty-state">
+        <p>Pas encore d'idée cadeau pour {{ memberName() }}.</p>
+        <p class="empty-state-sub">Clique sur « Ajouter une idée » pour commencer la liste.</p>
+      </div>
+    } @else if (filteredGifts().length === 0) {
+      <div class="empty-state">
+        <p>Aucun cadeau ne correspond à ta recherche ou au filtre sélectionné.</p>
+        <button class="btn-reset" (click)="resetFilters()">Réinitialiser les filtres</button>
+      </div>
+    }
+
     @for (gift of filteredGifts(); track gift.id) {
       <div
         class="gift-card"
@@ -37,22 +56,23 @@
         [class.important]="gift.is_important"
         [class.purchased]="gift.is_purchased">
 
-        <div class="badges-wrapper">
-          <button
-            type="button"
-            class="badge toggle-badge star-toggle"
-            [class.active]="gift.is_important"
-            [attr.aria-pressed]="gift.is_important"
-            aria-label="Marquer comme favori"
-            (click)="toggleImportant($event, gift)">
-            {{ gift.is_important ? '⭐ Favori' : '☆ Favori' }}
-          </button>
-          @if (gift.reserved_by) {
+        <button
+          type="button"
+          class="favorite-toggle"
+          [class.active]="gift.is_important"
+          [attr.aria-pressed]="gift.is_important"
+          aria-label="Marquer comme favori"
+          (click)="toggleImportant($event, gift)">
+          {{ gift.is_important ? '⭐' : '☆' }}
+        </button>
+
+        @if (gift.reserved_by) {
+          <div class="badges-wrapper">
             <div class="badge reserved-badge">
               <span>🎁</span> Réservé
             </div>
-          }
-        </div>
+          </div>
+        }
 
         <div class="gift-image-preview">
           @if (gift.image_url) {

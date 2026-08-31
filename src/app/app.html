@@ -1,1 +1,9 @@
 <router-outlet />
+
+<div class="toast-container">
+  @for (toast of toastSvc.messages(); track toast.id) {
+    <div class="toast" [class.error]="toast.type === 'error'" (click)="toastSvc.dismiss(toast.id)">
+      {{ toast.text }}
+    </div>
+  }
+</div>

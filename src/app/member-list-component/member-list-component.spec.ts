@@ -5,10 +5,15 @@ import { MemberListComponent } from './member-list-component';
 import { Supabase } from '../services/supabase';
 import { Gift } from '../models/gift/gift';
 
-// jsdom n'implémente pas showModal() sur <dialog>
+// jsdom n'implémente pas showModal()/close() sur <dialog>
 if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
     this.setAttribute('open', '');
+  };
+}
+if (!HTMLDialogElement.prototype.close) {
+  HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+    this.removeAttribute('open');
   };
 }
 
@@ -100,6 +105,27 @@ describe('MemberListComponent', () => {
 
     component.toggleYearFilter(2099);
     expect(component.filteredGifts().length).toBe(0);
+  });
+
+  it('filters gifts by a text search across title and comment', () => {
+    component.searchQuery.set('zebre');
+    expect(component.filteredGifts().map((g) => g.title)).toEqual(['Zebre en peluche']);
+
+    component.searchQuery.set('appareil');
+    expect(component.filteredGifts().map((g) => g.title)).toEqual(['Appareil photo']);
+
+    component.searchQuery.set('inexistant');
+    expect(component.filteredGifts()).toEqual([]);
+  });
+
+  it('resets both the year filter and the search query', () => {
+    component.toggleYearFilter(2026);
+    component.searchQuery.set('zebre');
+
+    component.resetFilters();
+
+    expect(component.selectedYears()).toEqual([]);
+    expect(component.searchQuery()).toBe('');
   });
 
   it('adds a new gift when the buffer has no id', async () => {

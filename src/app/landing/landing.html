@@ -43,11 +43,11 @@
 
 <dialog #profileModal class="modal" (click)="onBackdropClick($event)">
   <div class="modal-content">
-    <h2>Modifier le Profil</h2>
+    <h2>{{ selectedMember.id ? 'Modifier le Profil' : 'Nouveau Profil' }}</h2>
 
     <div class="form-group">
       <label>Prénom</label>
-      <input type="text" [(ngModel)]="selectedMember.name" placeholder="Prénom">
+      <input type="text" [(ngModel)]="selectedMember.name" placeholder="Prénom" required>
     </div>
 
     <div class="form-group">
@@ -68,7 +68,9 @@
 
     <div class="modal-actions">
       <button class="btn-cancel" (click)="closeModal()">Annuler</button>
-      <button class="btn-save" (click)="saveProfile()" [disabled]="email.invalid">Enregistrer</button>
+      <button class="btn-save" (click)="saveProfile()" [disabled]="email.invalid || !selectedMember.name">
+        {{ selectedMember.id ? 'Enregistrer' : 'Ajouter' }}
+      </button>
     </div>
   </div>
 </dialog>

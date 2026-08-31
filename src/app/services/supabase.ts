@@ -23,8 +23,11 @@ export class Supabase {
     return data || [];
   }
 
-  async addProfile(name: string) {
-    const { data, error } = await this.supabase.from('profiles').insert([{ name }]).select();
+  async addProfile(name: string, avatarUrl?: string) {
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .insert([{ name, avatar_url: avatarUrl || null }])
+      .select();
     if (error) throw error;
     return data;
   }

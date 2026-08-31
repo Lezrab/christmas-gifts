@@ -1,8 +1,9 @@
-import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { Supabase } from '../services/supabase';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Member } from '../models/member/member';
+import { Toast } from '../services/toast';
 
 @Component({
   selector: 'app-landing',
@@ -18,8 +19,9 @@ export class LandingComponent implements OnInit {
   familyMembers = signal<Member[]>([]);
   deletedMembers = signal<Member[]>([]);
   isLoading = signal(true);
-  // Objet tampon pour la modification
+  // Objet tampon pour la création/modification
   selectedMember: Partial<Member> = { id: '', name: '', mail: '', avatar_url: '' };
+  private toastSvc = inject(Toast);
 
   // Palette d'avatars par défaut
   private avatarColors = [
@@ -49,23 +51,15 @@ export class LandingComponent implements OnInit {
       this.familyMembers.set(members);
     } catch (err) {
       console.error(err);
-      alert('Erreur lors du chargement des profils');
+      this.toastSvc.show('Erreur lors du chargement des profils', 'error');
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  async openAddModal() {
-    const newName = prompt('Nom du nouveau membre ?');
-    if (newName) {
-      try {
-        await this.supabaseSvc.addProfile(newName);
-        await this.fetchMembers(); // Rafraîchit la liste
-      } catch (err) {
-        console.error(err);
-        alert("Erreur lors de l'ajout du profil");
-      }
-    }
+  openAddModal() {
+    this.selectedMember = { id: '', name: '', mail: '', avatar_url: '' };
+    this.modal.nativeElement.showModal();
   }
 
   goToMember(id: string) {
@@ -81,8 +75,9 @@ export class LandingComponent implements OnInit {
       if (!error) {
         // Met à jour la liste localement sans recharger toute la page
         this.familyMembers.update((members) => members.filter((m) => m.id !== id));
+        this.toastSvc.show('Profil envoyé à la corbeille');
       } else {
-        alert('Erreur lors de la suppression');
+        this.toastSvc.show('Erreur lors de la suppression', 'error');
       }
     }
   }
@@ -93,7 +88,7 @@ export class LandingComponent implements OnInit {
       this.deletedMembers.set(deleted);
     } catch (err) {
       console.error(err);
-      alert('Erreur lors du chargement de la corbeille');
+      this.toastSvc.show('Erreur lors du chargement de la corbeille', 'error');
       return;
     }
     this.trashModal.nativeElement.showModal();
@@ -106,10 +101,11 @@ export class LandingComponent implements OnInit {
   async restoreMember(id: string) {
     const error = await this.supabaseSvc.restoreProfile(id);
     if (error) {
-      alert('Erreur lors de la restauration');
+      this.toastSvc.show('Erreur lors de la restauration', 'error');
       return;
     }
     this.deletedMembers.update((members) => members.filter((m) => m.id !== id));
+    this.toastSvc.show('Profil restauré');
     await this.fetchMembers();
   }
 
@@ -119,10 +115,11 @@ export class LandingComponent implements OnInit {
 
     const error = await this.supabaseSvc.permanentlyDeleteProfile(id);
     if (error) {
-      alert('Erreur lors de la suppression définitive');
+      this.toastSvc.show('Erreur lors de la suppression définitive', 'error');
       return;
     }
     this.deletedMembers.update((members) => members.filter((m) => m.id !== id));
+    this.toastSvc.show('Profil supprimé définitivement');
   }
 
   async editMember(event: Event, member: Member) {
@@ -137,19 +134,30 @@ export class LandingComponent implements OnInit {
   }
 
   async saveProfile() {
-    if (!this.selectedMember.id) return;
+    const name = this.selectedMember.name?.trim();
+    if (!name) {
+      this.toastSvc.show('Le prénom est obligatoire', 'error');
+      return;
+    }
 
-    const { error } = await this.supabaseSvc.updateProfile(this.selectedMember.id, {
-      name: this.selectedMember.name,
-      mail: this.selectedMember.mail,
-      avatar_url: this.selectedMember.avatar_url,
-    });
-
-    if (!error) {
+    try {
+      if (this.selectedMember.id) {
+        const { error } = await this.supabaseSvc.updateProfile(this.selectedMember.id, {
+          name,
+          mail: this.selectedMember.mail,
+          avatar_url: this.selectedMember.avatar_url,
+        });
+        if (error) throw error;
+        this.toastSvc.show('Profil mis à jour');
+      } else {
+        await this.supabaseSvc.addProfile(name, this.selectedMember.avatar_url);
+        this.toastSvc.show('Profil ajouté');
+      }
       await this.fetchMembers();
       this.closeModal();
-    } else {
-      alert('Erreur de sauvegarde');
+    } catch (err) {
+      console.error(err);
+      this.toastSvc.show('Erreur de sauvegarde', 'error');
     }
   }
 
@@ -161,7 +169,7 @@ export class LandingComponent implements OnInit {
         const publicUrl = await this.supabaseSvc.uploadAvatar(file);
         this.selectedMember.avatar_url = publicUrl; // Met à jour l'aperçu
       } catch (err) {
-        alert("Erreur lors de l'upload");
+        this.toastSvc.show("Erreur lors de l'upload", 'error');
       }
     }
   }

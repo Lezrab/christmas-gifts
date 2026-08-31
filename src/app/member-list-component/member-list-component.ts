@@ -5,6 +5,7 @@ import { Gift } from '../models/gift/gift';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
 import { Title } from '@angular/platform-browser';
+import { Toast } from '../services/toast';
 
 @Component({
   selector: 'app-member-list',
@@ -23,6 +24,7 @@ export class MemberListComponent implements OnInit {
   @ViewChild('detailsModal') detailsModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('trashModal') trashModal!: ElementRef<HTMLDialogElement>;
   private titleService = inject(Title);
+  private toastSvc = inject(Toast);
   isUploading = signal(false);
 
   // Objet tampon pour le nouveau cadeau (ou celui en cours de modification)
@@ -45,22 +47,31 @@ export class MemberListComponent implements OnInit {
   ];
 
   selectedYears = signal<number[]>([]);
+  searchQuery = signal('');
+
   filteredGifts = computed(() => {
     const years = this.selectedYears();
-    const allGifts = this.gifts();
+    const query = this.searchQuery().trim().toLowerCase();
+    let result = this.gifts();
 
-    // Si aucune année n'est sélectionnée, on affiche tout
-    if (years.length === 0) return allGifts;
+    if (years.length > 0) {
+      result = result.filter((gift) => {
+        if (!gift.created_at) return false;
+        // Extraction robuste de l'année
+        const giftYear = parseInt(gift.created_at.split('-')[0]);
+        return years.includes(giftYear);
+      });
+    }
 
-    return allGifts.filter((gift) => {
-      if (!gift.created_at) return false;
+    if (query) {
+      result = result.filter(
+        (gift) =>
+          gift.title.toLowerCase().includes(query) ||
+          (gift.comment ?? '').toLowerCase().includes(query),
+      );
+    }
 
-      // Extraction robuste de l'année
-      const giftYear = parseInt(gift.created_at.split('-')[0]);
-
-      // On garde l'objet si son année est présente dans notre tableau de filtres
-      return years.includes(giftYear);
-    });
+    return result;
   });
 
   constructor(
@@ -95,12 +106,17 @@ export class MemberListComponent implements OnInit {
       this.gifts.set(this.sortGifts(data));
     } catch (err) {
       console.error(err);
-      alert('Erreur lors du chargement des données');
+      this.toastSvc.show('Erreur lors du chargement des données', 'error');
     }
   }
 
   goBack() {
     this.router.navigate(['/']);
+  }
+
+  resetFilters() {
+    this.selectedYears.set([]);
+    this.searchQuery.set('');
   }
 
   openGiftModal() {
@@ -139,6 +155,7 @@ export class MemberListComponent implements OnInit {
     if (!this.newGift.title) return;
 
     const giftData = { ...this.newGift };
+    const isUpdate = !!this.newGift.id;
 
     // On ajoute l'URL seulement si elle passe le test
     if (this.isValidUrl(this.newGift.url)) {
@@ -162,9 +179,10 @@ export class MemberListComponent implements OnInit {
       }
       this.closeGiftModal();
       await this.loadMemberData(); // Rafraîchit la liste dans tous les cas
+      this.toastSvc.show(isUpdate ? 'Cadeau modifié' : 'Cadeau ajouté');
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de l'enregistrement du cadeau");
+      this.toastSvc.show("Erreur lors de l'enregistrement du cadeau", 'error');
     }
   }
 
@@ -184,8 +202,13 @@ export class MemberListComponent implements OnInit {
   // Suppression douce : le cadeau part à la corbeille
   async deleteGift(event: Event, id: string) {
     event.stopPropagation(); // Empêche de déclencher d'autres clics
-    await this.supabaseSvc.deleteGift(id);
+    const error = await this.supabaseSvc.deleteGift(id);
+    if (error) {
+      this.toastSvc.show('Erreur lors de la suppression', 'error');
+      return;
+    }
     this.gifts.update((current) => current.filter((g) => g.id !== id));
+    this.toastSvc.show('Cadeau envoyé à la corbeille');
   }
 
   async openTrash() {
@@ -194,7 +217,7 @@ export class MemberListComponent implements OnInit {
       this.deletedGifts.set(deleted);
     } catch (err) {
       console.error(err);
-      alert('Erreur lors du chargement de la corbeille');
+      this.toastSvc.show('Erreur lors du chargement de la corbeille', 'error');
       return;
     }
     this.trashModal.nativeElement.showModal();
@@ -207,10 +230,11 @@ export class MemberListComponent implements OnInit {
   async restoreGift(id: string) {
     const error = await this.supabaseSvc.restoreGift(id);
     if (error) {
-      alert('Erreur lors de la restauration');
+      this.toastSvc.show('Erreur lors de la restauration', 'error');
       return;
     }
     this.deletedGifts.update((current) => current.filter((g) => g.id !== id));
+    this.toastSvc.show('Cadeau restauré');
     await this.loadMemberData();
   }
 
@@ -222,10 +246,11 @@ export class MemberListComponent implements OnInit {
 
     const error = await this.supabaseSvc.permanentlyDeleteGift(id);
     if (error) {
-      alert('Erreur lors de la suppression définitive');
+      this.toastSvc.show('Erreur lors de la suppression définitive', 'error');
       return;
     }
     this.deletedGifts.update((current) => current.filter((g) => g.id !== id));
+    this.toastSvc.show('Cadeau supprimé définitivement');
   }
 
   async togglePurchased(event: Event, gift: Gift) {
@@ -235,7 +260,7 @@ export class MemberListComponent implements OnInit {
     const nextValue = !gift.is_purchased;
     const { error } = await this.supabaseSvc.setGiftPurchased(gift.id, nextValue);
     if (error) {
-      alert('Erreur lors de la mise à jour');
+      this.toastSvc.show('Erreur lors de la mise à jour', 'error');
       return;
     }
     this.patchGiftLocally(gift.id, { is_purchased: nextValue });
@@ -248,7 +273,7 @@ export class MemberListComponent implements OnInit {
     const nextValue = !gift.is_important;
     const { error } = await this.supabaseSvc.setGiftImportant(gift.id, nextValue);
     if (error) {
-      alert('Erreur lors de la mise à jour');
+      this.toastSvc.show('Erreur lors de la mise à jour', 'error');
       return;
     }
     this.patchGiftLocally(gift.id, { is_important: nextValue });
@@ -290,10 +315,11 @@ export class MemberListComponent implements OnInit {
 
     const { error } = await this.supabaseSvc.reserveGift(gift.id, name);
     if (error) {
-      alert('Erreur lors de la réservation');
+      this.toastSvc.show('Erreur lors de la réservation', 'error');
       return;
     }
     this.patchGiftLocally(gift.id, { reserved_by: name });
+    this.toastSvc.show('Réservation enregistrée');
   }
 
   async releaseGift(event: Event, gift: Gift) {
@@ -302,10 +328,11 @@ export class MemberListComponent implements OnInit {
 
     const { error } = await this.supabaseSvc.reserveGift(gift.id, null);
     if (error) {
-      alert('Erreur lors de la libération du cadeau');
+      this.toastSvc.show('Erreur lors de la libération du cadeau', 'error');
       return;
     }
     this.patchGiftLocally(gift.id, { reserved_by: null });
+    this.toastSvc.show('Réservation annulée');
   }
 
   // Dans ta classe MemberListComponent
@@ -408,7 +435,7 @@ export class MemberListComponent implements OnInit {
     } catch (err) {
       console.error("Échec de l'upload immédiat :", err);
       this.isUploading.set(false);
-      alert("Erreur lors de l'envoi de l'image.");
+      this.toastSvc.show("Erreur lors de l'envoi de l'image.", 'error');
     }
   }
 
