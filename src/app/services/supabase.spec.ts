@@ -147,6 +147,16 @@ describe('Supabase', () => {
     expect(error).toBeNull();
   });
 
+  it('setGiftImportant updates the is_important column', async () => {
+    const builder = queryBuilder({ data: [{ id: 'g1', is_important: true }], error: null });
+    fromMock.mockReturnValue(builder);
+
+    const { error } = await service.setGiftImportant('g1', true);
+
+    expect(builder.update).toHaveBeenCalledWith({ is_important: true });
+    expect(error).toBeNull();
+  });
+
   it('uploadAvatar throws when the storage upload fails', async () => {
     storageFromMock.mockReturnValue({
       upload: vi.fn().mockResolvedValue({ error: new Error('storage down') }),

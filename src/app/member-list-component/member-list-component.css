@@ -64,17 +64,20 @@
 
 /* --- CADEAU MARQUÉ ACHETÉ --- */
 .gift-card.purchased {
-  opacity: 0.65;
+  opacity: 0.85;
+  border-color: var(--color-teal);
 }
 
 .gift-card.purchased .gift-image-preview img {
   filter: grayscale(1);
 }
 
-.purchased-badge {
-  background: var(--color-surface);
-  color: var(--color-accent-dark);
-  border: 1.5px dashed var(--color-accent);
+.gift-card h3.done,
+.modal-content h2.done {
+  text-decoration: line-through;
+  text-decoration-color: var(--color-teal);
+  text-decoration-thickness: 2px;
+  color: var(--color-muted);
 }
 
 /* --- IMPRESSION --- */
@@ -514,10 +517,41 @@
   white-space: nowrap;
 }
 
-/* Badge Priorité (favori) */
-.priority-badge {
+/* Badges interactifs (favori / trouvé), toujours visibles */
+.toggle-badge {
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.15s ease;
+}
+
+.toggle-badge:hover {
+  transform: translateY(-1px);
+}
+
+.star-toggle {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  border: 1px solid var(--color-line);
+}
+
+.star-toggle.active {
   background: var(--color-mustard);
   color: #3b2e0a;
+  border-color: var(--color-mustard);
+}
+
+.purchased-toggle {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  border: 1.5px dashed var(--color-line);
+}
+
+.purchased-toggle.active {
+  background: var(--color-teal);
+  color: white;
+  border: 1.5px solid var(--color-teal);
+  font-weight: 800;
 }
 
 /* Badge Année */
@@ -535,34 +569,6 @@
 /* Ajustement pour les boutons d'actions */
 .gift-card .card-actions {
   top: 42px; /* On descend un peu les boutons pour ne pas gêner les badges */
-}
-
-.priority-group {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin: 20px 0;
-  cursor: pointer;
-}
-
-.priority-group input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  cursor: pointer;
-  accent-color: var(--color-teal);
-}
-
-.priority-group label {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--color-muted);
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .filter-container {

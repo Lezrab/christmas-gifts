@@ -173,6 +173,15 @@ export class Supabase {
     return { data, error };
   }
 
+  async setGiftImportant(id: string, isImportant: boolean) {
+    const { data, error } = await this.supabase
+      .from('gifts')
+      .update({ is_important: isImportant })
+      .eq('id', id)
+      .select();
+    return { data, error };
+  }
+
   async reserveGift(id: string, reservedBy: string | null) {
     const { data, error } = await this.supabase
       .from('gifts')

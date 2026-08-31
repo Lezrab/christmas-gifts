@@ -246,15 +246,29 @@ export class MemberListComponent implements OnInit {
       alert('Erreur lors de la mise à jour');
       return;
     }
-    this.applyPurchased(gift.id, nextValue);
+    this.patchGiftLocally(gift.id, { is_purchased: nextValue });
   }
 
-  private applyPurchased(giftId: string, isPurchased: boolean) {
+  async toggleImportant(event: Event, gift: Gift) {
+    event.stopPropagation();
+    if (!gift.id) return;
+
+    const nextValue = !gift.is_important;
+    const { error } = await this.supabaseSvc.setGiftImportant(gift.id, nextValue);
+    if (error) {
+      alert('Erreur lors de la mise à jour');
+      return;
+    }
+    this.patchGiftLocally(gift.id, { is_important: nextValue });
+  }
+
+  // Met à jour un cadeau localement (liste + modale de détails si ouverte) sans tout recharger
+  private patchGiftLocally(giftId: string, patch: Partial<Gift>) {
     this.gifts.update((current) =>
-      current.map((g) => (g.id === giftId ? { ...g, is_purchased: isPurchased } : g)),
+      current.map((g) => (g.id === giftId ? { ...g, ...patch } : g)),
     );
     if (this.selectedGift()?.id === giftId) {
-      this.selectedGift.update((g) => (g ? { ...g, is_purchased: isPurchased } : g));
+      this.selectedGift.update((g) => (g ? { ...g, ...patch } : g));
     }
   }
 
@@ -274,7 +288,7 @@ export class MemberListComponent implements OnInit {
       alert('Erreur lors de la réservation');
       return;
     }
-    this.applyReservation(gift.id, name);
+    this.patchGiftLocally(gift.id, { reserved_by: name });
   }
 
   async releaseGift(event: Event, gift: Gift) {
@@ -286,16 +300,7 @@ export class MemberListComponent implements OnInit {
       alert('Erreur lors de la libération du cadeau');
       return;
     }
-    this.applyReservation(gift.id, null);
-  }
-
-  private applyReservation(giftId: string, reservedBy: string | null) {
-    this.gifts.update((current) =>
-      current.map((g) => (g.id === giftId ? { ...g, reserved_by: reservedBy } : g)),
-    );
-    if (this.selectedGift()?.id === giftId) {
-      this.selectedGift.update((g) => (g ? { ...g, reserved_by: reservedBy } : g));
-    }
+    this.patchGiftLocally(gift.id, { reserved_by: null });
   }
 
   // Dans ta classe MemberListComponent

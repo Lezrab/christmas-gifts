@@ -38,17 +38,27 @@
         [class.purchased]="gift.is_purchased">
 
         <div class="badges-wrapper">
-          @if (gift.is_purchased) {
-            <div class="badge purchased-badge">Trouvé ✓</div>
-          }
+          <button
+            type="button"
+            class="badge toggle-badge star-toggle"
+            [class.active]="gift.is_important"
+            [attr.aria-pressed]="gift.is_important"
+            aria-label="Marquer comme favori"
+            (click)="toggleImportant($event, gift)">
+            {{ gift.is_important ? '⭐ Favori' : '☆ Favori' }}
+          </button>
+          <button
+            type="button"
+            class="badge toggle-badge purchased-toggle"
+            [class.active]="gift.is_purchased"
+            [attr.aria-pressed]="gift.is_purchased"
+            aria-label="Marquer comme trouvé"
+            (click)="togglePurchased($event, gift)">
+            {{ gift.is_purchased ? '✓ Trouvé' : 'Trouvé ?' }}
+          </button>
           <div class="badge year-badge">
             <span>📅</span> {{ getYear(gift.created_at) }}
           </div>
-          @if (gift.is_important) {
-            <div class="badge priority-badge">
-              <span>⭐</span>
-            </div>
-          }
           @if (gift.reserved_by) {
             <div class="badge reserved-badge">
               <span>🎁</span> Réservé
@@ -76,7 +86,7 @@
           @if (gift.price) {
             <span class="price-tag">{{ gift.price }}€</span>
           }
-          <h3>{{ gift.title }}</h3>
+          <h3 [class.done]="gift.is_purchased">{{ gift.title }}</h3>
           <p>{{ gift.comment }}</p>
         </div>
 
@@ -152,11 +162,6 @@
           <span class="success-icon">✨</span>
         }
       </div>
-
-      <div class="form-group priority-group">
-        <input type="checkbox" id="important" [(ngModel)]="newGift.is_important">
-        <label for="important">C'EST UN CADEAU FAVORI ✨</label>
-      </div>
     </div>
 
     <div class="modal-actions">
@@ -176,7 +181,7 @@
         </div>
       }
 
-      <h2>{{ gift.title }}</h2>
+      <h2 [class.done]="gift.is_purchased">{{ gift.title }}</h2>
 
       <div class="details-info-grid">
         @if (gift.price) {
@@ -206,13 +211,6 @@
         } @else {
           <button class="btn-save" (click)="reserveGift($event, gift)">Je m'en occupe 🎁</button>
         }
-      </div>
-
-      <div class="detail-item full-width">
-        <label>Statut</label>
-        <button class="btn-save" (click)="togglePurchased($event, gift)">
-          {{ gift.is_purchased ? '↩️ Marquer comme non trouvé' : '✅ Marquer comme trouvé' }}
-        </button>
       </div>
 
       <div class="modal-actions">

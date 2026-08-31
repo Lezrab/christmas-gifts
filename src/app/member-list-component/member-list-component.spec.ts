@@ -47,6 +47,7 @@ describe('MemberListComponent', () => {
       deleteGift: vi.fn().mockResolvedValue(null),
       reserveGift: vi.fn().mockResolvedValue({ data: [], error: null }),
       setGiftPurchased: vi.fn().mockResolvedValue({ data: [], error: null }),
+      setGiftImportant: vi.fn().mockResolvedValue({ data: [], error: null }),
       getDeletedGiftsByMember: vi.fn().mockResolvedValue([]),
       restoreGift: vi.fn().mockResolvedValue(null),
       permanentlyDeleteGift: vi.fn().mockResolvedValue(null),
@@ -159,6 +160,18 @@ describe('MemberListComponent', () => {
     const purchased = { ...gifts[0], is_purchased: true };
     await component.togglePurchased(event, purchased);
     expect(supabaseMock['setGiftPurchased']).toHaveBeenCalledWith('g1', false);
+  });
+
+  it('marks a gift as favorite and toggles it back', async () => {
+    const event = new Event('click');
+
+    await component.toggleImportant(event, gifts[0]);
+    expect(supabaseMock['setGiftImportant']).toHaveBeenCalledWith('g1', true);
+    expect(component.gifts().find((g) => g.id === 'g1')?.is_important).toBe(true);
+
+    const favorite = { ...gifts[0], is_important: true };
+    await component.toggleImportant(event, favorite);
+    expect(supabaseMock['setGiftImportant']).toHaveBeenCalledWith('g1', false);
   });
 
   it('sends the gift to the trash and moves it out of the active list', async () => {
