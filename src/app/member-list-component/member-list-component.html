@@ -38,6 +38,9 @@
         [class.purchased]="gift.is_purchased">
 
         <div class="badges-wrapper">
+          @if (gift.is_purchased) {
+            <div class="badge purchased-badge">Trouvé ✓</div>
+          }
           <div class="badge year-badge">
             <span>📅</span> {{ getYear(gift.created_at) }}
           </div>
@@ -54,9 +57,6 @@
         </div>
 
         <div class="gift-image-preview">
-          @if (gift.is_purchased) {
-            <div class="purchased-tag">Trouvé ✓</div>
-          }
           @if (gift.image_url) {
             <img [src]="gift.image_url" alt="Aperçu du cadeau">
           } @else {
@@ -216,12 +216,12 @@
       </div>
 
       <div class="modal-actions">
-        <button class="btn-cancel" (click)="closeDetailsModal()">Fermer</button>
         @if (gift.url) {
           <a [href]="gift.url" target="_blank" class="btn-save">
             Voir sur le site →
           </a>
         }
+        <button class="btn-cancel" (click)="closeDetailsModal()">Fermer</button>
       </div>
     </div>
   }

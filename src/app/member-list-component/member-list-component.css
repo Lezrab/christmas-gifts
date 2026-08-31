@@ -71,20 +71,10 @@
   filter: grayscale(1);
 }
 
-.purchased-tag {
-  position: absolute;
-  top: 10px;
-  left: 10px;
+.purchased-badge {
   background: var(--color-surface);
   color: var(--color-accent-dark);
   border: 1.5px dashed var(--color-accent);
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 0.7rem;
-  padding: 3px 10px;
-  border-radius: 20px;
-  letter-spacing: 0.3px;
-  z-index: 20;
 }
 
 /* --- IMPRESSION --- */
@@ -95,7 +85,6 @@
   .add-gift-card,
   .card-actions,
   .badges-wrapper,
-  .purchased-tag,
   dialog {
     display: none !important;
   }
@@ -504,8 +493,11 @@
   position: absolute;
   top: 10px;
   right: 10px;
+  left: 82px; /* Laisse la place aux boutons modifier/supprimer à gauche */
   display: flex;
-  flex-direction: row; /* La priorité sera à droite de l'année */
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 6px;
   z-index: 10;
 }
