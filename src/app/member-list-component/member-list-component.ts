@@ -92,15 +92,7 @@ export class MemberListComponent implements OnInit {
 
       // On récupère les cadeaux liés à ce membre
       const data = await this.supabaseSvc.getGiftsByMember(this.memberId);
-
-      // Tri : Important d'abord, puis par titre
-      const sortedGifts = data.sort((a, b) => {
-        if (a.is_important === b.is_important) {
-          return a.title.localeCompare(b.title);
-        }
-        return a.is_important ? -1 : 1;
-      });
-      this.gifts.set(sortedGifts);
+      this.gifts.set(this.sortGifts(data));
     } catch (err) {
       console.error(err);
       alert('Erreur lors du chargement des données');
@@ -262,10 +254,23 @@ export class MemberListComponent implements OnInit {
     this.patchGiftLocally(gift.id, { is_important: nextValue });
   }
 
+  // Tri : cadeaux trouvés à la fin, puis favoris d'abord, puis par titre
+  private sortGifts(gifts: Gift[]): Gift[] {
+    return [...gifts].sort((a, b) => {
+      if (a.is_purchased !== b.is_purchased) {
+        return a.is_purchased ? 1 : -1;
+      }
+      if (a.is_important === b.is_important) {
+        return a.title.localeCompare(b.title);
+      }
+      return a.is_important ? -1 : 1;
+    });
+  }
+
   // Met à jour un cadeau localement (liste + modale de détails si ouverte) sans tout recharger
   private patchGiftLocally(giftId: string, patch: Partial<Gift>) {
     this.gifts.update((current) =>
-      current.map((g) => (g.id === giftId ? { ...g, ...patch } : g)),
+      this.sortGifts(current.map((g) => (g.id === giftId ? { ...g, ...patch } : g))),
     );
     if (this.selectedGift()?.id === giftId) {
       this.selectedGift.update((g) => (g ? { ...g, ...patch } : g));

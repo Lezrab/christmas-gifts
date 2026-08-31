@@ -47,15 +47,6 @@
             (click)="toggleImportant($event, gift)">
             {{ gift.is_important ? '⭐ Favori' : '☆ Favori' }}
           </button>
-          <button
-            type="button"
-            class="badge toggle-badge purchased-toggle"
-            [class.active]="gift.is_purchased"
-            [attr.aria-pressed]="gift.is_purchased"
-            aria-label="Marquer comme trouvé"
-            (click)="togglePurchased($event, gift)">
-            {{ gift.is_purchased ? '✓ Trouvé' : 'Trouvé ?' }}
-          </button>
           @if (gift.reserved_by) {
             <div class="badge reserved-badge">
               <span>🎁</span> Réservé
@@ -73,6 +64,15 @@
             </div>
           }
         </div>
+
+        <button
+          type="button"
+          class="found-toggle"
+          [class.active]="gift.is_purchased"
+          [attr.aria-pressed]="gift.is_purchased"
+          (click)="togglePurchased($event, gift)">
+          {{ gift.is_purchased ? '✓ Trouvé' : 'Marquer comme trouvé' }}
+        </button>
 
         <div class="card-actions" (click)="$event.stopPropagation()">
           <button class="edit-btn" aria-label="Modifier le cadeau" (click)="openGiftUpdateModal(gift)">&#8942;</button>

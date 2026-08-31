@@ -79,6 +79,18 @@ describe('MemberListComponent', () => {
     expect(component.gifts().map((g) => g.title)).toEqual(['Appareil photo', 'Zebre en peluche']);
   });
 
+  it('moves a gift to the end of the list once marked as purchased, even if it is a favorite', async () => {
+    const event = new Event('click');
+
+    // "Appareil photo" (favori) est trouvé, il doit passer derrière "Zebre en peluche"
+    await component.togglePurchased(event, gifts[1]);
+
+    expect(component.gifts().map((g) => g.title)).toEqual([
+      'Zebre en peluche',
+      'Appareil photo',
+    ]);
+  });
+
   it('filters gifts by selected years', () => {
     component.toggleYearFilter(2026);
     expect(component.filteredGifts().length).toBe(2);

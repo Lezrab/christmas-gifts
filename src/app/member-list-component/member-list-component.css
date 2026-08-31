@@ -88,6 +88,7 @@
   .add-gift-card,
   .card-actions,
   .badges-wrapper,
+  .found-toggle,
   dialog {
     display: none !important;
   }
@@ -541,17 +542,37 @@
   border-color: var(--color-mustard);
 }
 
-.purchased-toggle {
-  background: var(--color-surface);
+/* Barre pleine largeur sous la photo : impossible à manquer */
+.found-toggle {
+  width: calc(100% + 40px);
+  margin: 0 -20px 15px -20px;
+  border: none;
+  border-top: 1px solid var(--color-line);
+  padding: 10px 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #f4f6f7;
   color: var(--color-muted);
-  border: 1.5px dashed var(--color-line);
 }
 
-.purchased-toggle.active {
+.found-toggle:hover {
+  background: var(--color-teal-soft);
+  color: #3e5157;
+}
+
+.found-toggle.active {
   background: var(--color-teal);
   color: white;
-  border: 1.5px solid var(--color-teal);
+  border-top-color: var(--color-teal);
   font-weight: 800;
+}
+
+.found-toggle.active:hover {
+  background: #4c6b70;
 }
 
 /* Badge Année */
