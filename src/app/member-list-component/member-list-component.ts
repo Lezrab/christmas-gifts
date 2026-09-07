@@ -279,7 +279,7 @@ export class MemberListComponent implements OnInit {
     this.patchGiftLocally(gift.id, { is_important: nextValue });
   }
 
-  // Tri : cadeaux trouvés à la fin, puis favoris d'abord, puis par titre
+  // Tri : cadeaux achetés à la fin, puis favoris d'abord, puis par titre
   private sortGifts(gifts: Gift[]): Gift[] {
     return [...gifts].sort((a, b) => {
       if (a.is_purchased !== b.is_purchased) {

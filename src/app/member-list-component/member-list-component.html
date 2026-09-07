@@ -91,7 +91,7 @@
           [class.active]="gift.is_purchased"
           [attr.aria-pressed]="gift.is_purchased"
           (click)="togglePurchased($event, gift)">
-          {{ gift.is_purchased ? '✓ Trouvé' : 'Marquer comme trouvé' }}
+          {{ gift.is_purchased ? '✓ Acheté' : 'Marquer comme Acheté' }}
         </button>
 
         <div class="card-actions" (click)="$event.stopPropagation()">
