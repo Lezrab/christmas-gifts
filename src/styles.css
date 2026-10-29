@@ -14,8 +14,46 @@
   --color-accent-dark: #a34e53;
   --color-accent-soft: #f3dfe1;
   --color-teal: #5b7c82; /* accent secondaire */
+  --color-teal-dark: #4c6b70;
   --color-teal-soft: #d9e4e6;
   --color-mustard: #d9a441; /* favoris */
+}
+
+/* Thème de Noël — activé par la classe posée sur <body> (environment.christmasTheme) */
+body.christmas {
+  --color-bg: #f4efe8; /* blanc neige chaud */
+  --color-ink: #2b2f2a;
+  --color-muted: #5f665c;
+  --color-line: #e5dccf;
+
+  --color-accent: #b8323a; /* rouge sapin de Noël */
+  --color-accent-dark: #8f222a;
+  --color-accent-soft: #f6dcdc;
+  --color-teal: #2f6b4f; /* vert sapin */
+  --color-teal-dark: #24543e;
+  --color-teal-soft: #d7e8dd;
+  --color-mustard: #d4a017; /* or */
+
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(184, 50, 58, 0.08), transparent 45%),
+    radial-gradient(circle at 80% 100%, rgba(47, 107, 79, 0.08), transparent 45%);
+  background-attachment: fixed;
+  padding-top: 12px;
+}
+
+body.christmas .landing-container h1::before,
+body.christmas .landing-container h1::after {
+  content: '🎄';
+  margin: 0 0.35em;
+}
+
+/* Liseré rouge / vert en alternance sur les cartes de profil */
+body.christmas .card.profile {
+  border-top: 5px solid var(--color-accent);
+}
+
+body.christmas .card.profile:nth-child(even) {
+  border-top-color: var(--color-teal);
 }
 
 body {

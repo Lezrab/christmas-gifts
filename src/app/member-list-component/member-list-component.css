@@ -151,7 +151,7 @@
   height: 200px;
   background:
     radial-gradient(circle, rgba(91, 124, 130, 0.16) 2px, transparent 2.4px) 0 0 / 14px 14px,
-    #eef1f3;
+    var(--color-bg);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -378,7 +378,7 @@
 }
 
 .btn-save:hover {
-  background: #4c6b70;
+  background: var(--color-teal-dark);
   transform: scale(1.03);
 }
 
@@ -580,7 +580,7 @@
 }
 
 .found-toggle.active:hover {
-  background: #4c6b70;
+  background: var(--color-teal-dark);
 }
 
 /* Badge Réservé */

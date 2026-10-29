@@ -314,7 +314,7 @@
 }
 
 .btn-save:hover {
-  background: #4c6b70;
+  background: var(--color-teal-dark);
   transform: scale(1.03);
   box-shadow: 0 6px 20px rgba(91, 124, 130, 0.4);
 }

@@ -1,3 +1,24 @@
+@if (christmas) {
+  <div class="garland" aria-hidden="true">
+    @for (bulb of bulbs; track bulb) {
+      <span class="bulb"></span>
+    }
+  </div>
+
+  <div class="snow" aria-hidden="true">
+    @for (flake of snowflakes; track $index) {
+      <span
+        class="flake"
+        [style.left.%]="flake.left"
+        [style.width.px]="flake.size"
+        [style.height.px]="flake.size"
+        [style.opacity]="flake.opacity"
+        [style.animation-duration.s]="flake.duration"
+        [style.animation-delay.s]="flake.delay"></span>
+    }
+  </div>
+}
+
 <router-outlet />
 
 <div class="toast-container">

@@ -3,4 +3,5 @@ export const environment = {
   supabaseUrl: '',
   supabaseKey: '',
   linkPreviewKey: '',
+  christmasTheme: true,
 };
