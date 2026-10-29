@@ -19,8 +19,10 @@
   --color-mustard: #d9a441; /* favoris */
 }
 
-/* Thème de Noël — activé par la classe posée sur <body> (environment.christmasTheme) */
-body.christmas {
+/* Thèmes saisonniers — activés par la classe posée sur <body> (voir app/theme.ts) */
+
+/* --- Noël --- */
+body.theme-christmas {
   --color-bg: #f4efe8; /* blanc neige chaud */
   --color-ink: #2b2f2a;
   --color-muted: #5f665c;
@@ -39,20 +41,44 @@ body.christmas {
     radial-gradient(circle at 80% 100%, rgba(47, 107, 79, 0.08), transparent 45%);
   background-attachment: fixed;
   padding-top: 12px;
+  --title-emoji: '🎄';
 }
 
-body.christmas .landing-container h1::before,
-body.christmas .landing-container h1::after {
-  content: '🎄';
+/* --- Halloween --- */
+body.theme-halloween {
+  --color-bg: #f1ebf3; /* brume lavande */
+  --color-ink: #2a2230;
+  --color-muted: #625a6b;
+  --color-line: #e0d6e6;
+
+  --color-accent: #c85f14; /* orange citrouille */
+  --color-accent-dark: #9c4710;
+  --color-accent-soft: #fbe1cc;
+  --color-teal: #6a3d8f; /* violet sorcière */
+  --color-teal-dark: #552f74;
+  --color-teal-soft: #e7dcf0;
+  --color-mustard: #e0a526;
+
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(106, 61, 143, 0.12), transparent 45%),
+    radial-gradient(circle at 85% 100%, rgba(200, 95, 20, 0.1), transparent 45%);
+  background-attachment: fixed;
+  --title-emoji: '🎃';
+}
+
+/* --- Commun aux thèmes saisonniers --- */
+body[class*='theme-'] .landing-container h1::before,
+body[class*='theme-'] .landing-container h1::after {
+  content: var(--title-emoji);
   margin: 0 0.35em;
 }
 
-/* Liseré rouge / vert en alternance sur les cartes de profil */
-body.christmas .card.profile {
+/* Liseré aux couleurs du thème, en alternance, sur les cartes de profil */
+body[class*='theme-'] .card.profile {
   border-top: 5px solid var(--color-accent);
 }
 
-body.christmas .card.profile:nth-child(even) {
+body[class*='theme-'] .card.profile:nth-child(even) {
   border-top-color: var(--color-teal);
 }
 

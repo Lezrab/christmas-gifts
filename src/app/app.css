@@ -137,19 +137,109 @@
   }
 }
 
+/* --- THÈME HALLOWEEN --- */
+
+/* Araignées suspendues à leur fil en haut de page */
+.spiders {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.spider {
+  position: absolute;
+  top: var(--thread);
+  font-size: 22px;
+  line-height: 1;
+  animation: dangle 3s ease-in-out infinite alternate;
+}
+
+/* Le fil, qui remonte jusqu'en haut de la page */
+.spider::before {
+  content: '';
+  position: absolute;
+  bottom: 80%;
+  left: 50%;
+  width: 1px;
+  height: calc(var(--thread) + 30px);
+  background: rgba(60, 50, 70, 0.45);
+}
+
+/* Sur mobile, on garde seulement les araignées des bords pour ne pas masquer le titre */
+@media (max-width: 600px) {
+  .spider:nth-child(2),
+  .spider:nth-child(3) {
+    display: none;
+  }
+}
+
+@keyframes dangle {
+  from {
+    transform: translateY(-12px);
+  }
+  to {
+    transform: translateY(10px);
+  }
+}
+
+/* Chauves-souris qui traversent l'écran */
+.bats {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.bat {
+  position: absolute;
+  left: 0;
+  opacity: 0.8;
+  animation-name: fly;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fly {
+  0% {
+    transform: translate(-10vw, 0);
+  }
+  25% {
+    transform: translate(20vw, -30px);
+  }
+  50% {
+    transform: translate(50vw, 15px);
+  }
+  75% {
+    transform: translate(80vw, -25px);
+  }
+  100% {
+    transform: translate(110vw, 5px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .snow {
+  .snow,
+  .bats {
     display: none;
   }
 
-  .bulb {
+  .bulb,
+  .spider {
     animation: none;
   }
 }
 
 @media print {
   .garland,
-  .snow {
+  .snow,
+  .spiders,
+  .bats {
     display: none;
   }
 }

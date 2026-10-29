@@ -1,22 +1,47 @@
-@if (christmas) {
-  <div class="garland" aria-hidden="true">
-    @for (bulb of bulbs; track bulb) {
-      <span class="bulb"></span>
-    }
-  </div>
+@switch (theme) {
+  @case ('christmas') {
+    <div class="garland" aria-hidden="true">
+      @for (bulb of bulbs; track bulb) {
+        <span class="bulb"></span>
+      }
+    </div>
 
-  <div class="snow" aria-hidden="true">
-    @for (flake of snowflakes; track $index) {
-      <span
-        class="flake"
-        [style.left.%]="flake.left"
-        [style.width.px]="flake.size"
-        [style.height.px]="flake.size"
-        [style.opacity]="flake.opacity"
-        [style.animation-duration.s]="flake.duration"
-        [style.animation-delay.s]="flake.delay"></span>
-    }
-  </div>
+    <div class="snow" aria-hidden="true">
+      @for (flake of snowflakes; track $index) {
+        <span
+          class="flake"
+          [style.left.%]="flake.left"
+          [style.width.px]="flake.size"
+          [style.height.px]="flake.size"
+          [style.opacity]="flake.opacity"
+          [style.animation-duration.s]="flake.duration"
+          [style.animation-delay.s]="flake.delay"></span>
+      }
+    </div>
+  }
+
+  @case ('halloween') {
+    <div class="spiders" aria-hidden="true">
+      @for (spider of spiders; track $index) {
+        <span
+          class="spider"
+          [style.left.%]="spider.left"
+          [style.--thread]="spider.thread + 'px'"
+          [style.animation-delay.s]="spider.delay">🕷️</span>
+      }
+    </div>
+
+    <div class="bats" aria-hidden="true">
+      @for (bat of bats; track $index) {
+        <span
+          class="bat"
+          [style.top.%]="bat.top"
+          [style.font-size.px]="bat.size"
+          [style.animation-duration.s]="bat.duration"
+          [style.animation-delay.s]="bat.delay">🦇</span>
+      }
+    </div>
+  }
 }
 
 <router-outlet />

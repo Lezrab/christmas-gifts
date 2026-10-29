@@ -1,7 +1,9 @@
+import { ThemeSetting } from '../app/theme';
+
 export const environment = {
   production: true,
   supabaseUrl: '',
   supabaseKey: '',
   linkPreviewKey: '',
-  christmasTheme: true,
+  theme: 'auto' as ThemeSetting,
 };
