@@ -375,11 +375,13 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
 }
 
 .btn-save:hover {
   background: var(--color-teal-dark);
   transform: scale(1.03);
+  text-decoration: none;
 }
 
 .btn-cancel {
