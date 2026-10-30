@@ -92,6 +92,7 @@
   .found-toggle,
   .favorite-toggle,
   .empty-state,
+  .gift-card.purchased,
   dialog {
     display: none !important;
   }
@@ -484,6 +485,76 @@
   white-space: pre-wrap; /* Respecte les retours à la ligne de l'utilisateur */
   word-break: break-word; /* Casse les longs textes comme "abcdefgh..." */
   margin: 0;
+}
+
+/* --- COMMENTAIRES (fil de discussion) --- */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.comment-item {
+  position: relative;
+  background: #f7f9fa;
+  border-left: 4px solid var(--color-teal);
+  padding: 10px 36px 10px 12px;
+  border-radius: 4px 10px 10px 4px;
+}
+
+.comment-meta {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+.comment-meta strong {
+  color: var(--color-ink);
+}
+
+.comment-content {
+  margin: 0;
+  color: var(--color-ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comment-delete {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.comment-delete:hover {
+  color: var(--color-ink);
+}
+
+.no-comments {
+  color: var(--color-muted);
+  font-style: italic;
+  margin: 0 0 12px;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-form .btn-save {
+  align-self: flex-end;
+}
+
+.comment-form .btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .price-value {

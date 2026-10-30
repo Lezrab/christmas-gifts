@@ -2,6 +2,7 @@ import { Component, computed, ElementRef, inject, OnInit, signal, ViewChild } fr
 import { ActivatedRoute, Router } from '@angular/router';
 import { Supabase } from '../services/supabase';
 import { Gift } from '../models/gift/gift';
+import { GiftComment } from '../models/gift-comment/gift-comment';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
 import { Title } from '@angular/platform-browser';
@@ -26,6 +27,11 @@ export class MemberListComponent implements OnInit {
   private titleService = inject(Title);
   private toastSvc = inject(Toast);
   isUploading = signal(false);
+
+  // Fil de commentaires du cadeau affiché dans la modale de détails
+  comments = signal<GiftComment[]>([]);
+  commentAuthor = this.getSavedCommentAuthor();
+  newCommentContent = '';
 
   // Objet tampon pour le nouveau cadeau (ou celui en cours de modification)
   newGift: Partial<Gift> = {
@@ -143,12 +149,67 @@ export class MemberListComponent implements OnInit {
 
   openDetailsModal(gift: Gift) {
     this.selectedGift.set(gift);
+    this.comments.set([]);
+    this.newCommentContent = '';
     this.detailsModal.nativeElement.showModal();
+    this.loadComments(gift.id!);
   }
 
   closeDetailsModal() {
     this.detailsModal.nativeElement.close();
     this.selectedGift.set(null);
+  }
+
+  async loadComments(giftId: string) {
+    try {
+      const data = await this.supabaseSvc.getCommentsByGift(giftId);
+      // On ignore la réponse si l'utilisateur a changé de cadeau entre-temps
+      if (this.selectedGift()?.id === giftId) {
+        this.comments.set(data);
+      }
+    } catch (err) {
+      console.error(err);
+      this.toastSvc.show('Erreur lors du chargement des commentaires', 'error');
+    }
+  }
+
+  async addComment() {
+    const gift = this.selectedGift();
+    const author = this.commentAuthor.trim();
+    const content = this.newCommentContent.trim();
+    if (!gift?.id || !author || !content) return;
+
+    try {
+      const created = await this.supabaseSvc.addComment({ gift_id: gift.id, author, content });
+      this.comments.update((current) => [...current, created]);
+      this.newCommentContent = '';
+      // On mémorise le prénom pour les prochains commentaires
+      try {
+        localStorage.setItem('commentAuthor', author);
+      } catch {}
+    } catch (err) {
+      console.error(err);
+      this.toastSvc.show("Erreur lors de l'ajout du commentaire", 'error');
+    }
+  }
+
+  async deleteComment(id: string) {
+    const error = await this.supabaseSvc.deleteComment(id);
+    if (error) {
+      this.toastSvc.show('Erreur lors de la suppression du commentaire', 'error');
+      return;
+    }
+    this.comments.update((current) => current.filter((c) => c.id !== id));
+  }
+
+  formatCommentDate(dateString?: string): string {
+    if (!dateString) return '';
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(dateString));
   }
 
   async saveGift() {
@@ -436,6 +497,14 @@ export class MemberListComponent implements OnInit {
       console.error("Échec de l'upload immédiat :", err);
       this.isUploading.set(false);
       this.toastSvc.show("Erreur lors de l'envoi de l'image.", 'error');
+    }
+  }
+
+  private getSavedCommentAuthor(): string {
+    try {
+      return localStorage.getItem('commentAuthor') ?? '';
+    } catch {
+      return '';
     }
   }
 

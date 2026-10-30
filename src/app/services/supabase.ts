@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 import { Gift } from '../models/gift/gift';
+import { GiftComment } from '../models/gift-comment/gift-comment';
 
 @Injectable({
   providedIn: 'root',
@@ -183,6 +184,31 @@ export class Supabase {
       .eq('id', id)
       .select();
     return { data, error };
+  }
+
+  async getCommentsByGift(giftId: string): Promise<GiftComment[]> {
+    const { data, error } = await this.supabase
+      .from('gift_comments')
+      .select('*')
+      .eq('gift_id', giftId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  }
+
+  async addComment(comment: GiftComment): Promise<GiftComment> {
+    const { data, error } = await this.supabase
+      .from('gift_comments')
+      .insert([comment])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  async deleteComment(id: string) {
+    const { error } = await this.supabase.from('gift_comments').delete().eq('id', id);
+    return error;
   }
 
   async reserveGift(id: string, reservedBy: string | null) {

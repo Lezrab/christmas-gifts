@@ -230,6 +230,36 @@
         }
       </div>
 
+      <div class="detail-item full-width">
+        <label>Commentaires</label>
+        @if (comments().length === 0) {
+          <p class="no-comments">Aucun commentaire pour l'instant.</p>
+        } @else {
+          <div class="comments-list">
+            @for (comment of comments(); track comment.id) {
+              <div class="comment-item">
+                <div class="comment-meta">
+                  <strong>{{ comment.author }}</strong> · {{ formatCommentDate(comment.created_at) }}
+                </div>
+                <p class="comment-content">{{ comment.content }}</p>
+                <button class="comment-delete" aria-label="Supprimer le commentaire" (click)="deleteComment(comment.id!)">&times;</button>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="form-group comment-form">
+          <input type="text" [(ngModel)]="commentAuthor" placeholder="Ton prénom">
+          <textarea [(ngModel)]="newCommentContent" rows="2" placeholder="Écrire un commentaire..."></textarea>
+          <button
+            class="btn-save"
+            [disabled]="!commentAuthor.trim() || !newCommentContent.trim()"
+            (click)="addComment()">
+            Envoyer
+          </button>
+        </div>
+      </div>
+
       <div class="modal-actions">
         @if (gift.url) {
           <a [href]="gift.url" target="_blank" class="btn-save">
