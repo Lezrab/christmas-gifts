@@ -28,6 +28,11 @@ export class MemberListComponent implements OnInit {
   private toastSvc = inject(Toast);
   isUploading = signal(false);
 
+  // Note du profil (tailles, pointure...) affichée en haut de la liste
+  memberNotes = signal('');
+  isEditingNotes = signal(false);
+  notesDraft = '';
+
   // Fil de commentaires du cadeau affiché dans la modale de détails
   comments = signal<GiftComment[]>([]);
   commentAuthor = this.getSavedCommentAuthor();
@@ -105,6 +110,7 @@ export class MemberListComponent implements OnInit {
       // On récupère le profil pour avoir le nom
       const profile = await this.supabaseSvc.getProfileById(this.memberId);
       this.memberName.set(profile?.name || 'Inconnu');
+      this.memberNotes.set(profile?.notes ?? '');
       this.titleService.setTitle(this.getListTitle(this.memberName()));
 
       // On récupère les cadeaux liés à ce membre
@@ -118,6 +124,28 @@ export class MemberListComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/']);
+  }
+
+  startEditingNotes() {
+    this.notesDraft = this.memberNotes();
+    this.isEditingNotes.set(true);
+  }
+
+  cancelEditingNotes() {
+    this.isEditingNotes.set(false);
+  }
+
+  async saveNotes() {
+    const notes = this.notesDraft.trim();
+    const { error } = await this.supabaseSvc.updateProfile(this.memberId, { notes: notes || null });
+    if (error) {
+      console.error(error);
+      this.toastSvc.show("Erreur lors de l'enregistrement des infos", 'error');
+      return;
+    }
+    this.memberNotes.set(notes);
+    this.isEditingNotes.set(false);
+    this.toastSvc.show('Infos enregistrées');
   }
 
   resetFilters() {

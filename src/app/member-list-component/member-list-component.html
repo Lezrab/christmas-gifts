@@ -10,6 +10,36 @@
     </div>
   </header>
 
+  <section class="profile-notes">
+    <div class="profile-notes-header">
+      <h2>📏 Infos utiles</h2>
+      @if (!isEditingNotes()) {
+        <button class="btn-icon-text" (click)="startEditingNotes()">
+          {{ memberNotes() ? '✏️ Modifier' : '➕ Ajouter' }}
+        </button>
+      }
+    </div>
+
+    @if (isEditingNotes()) {
+      <div class="form-group">
+        <textarea
+          [(ngModel)]="notesDraft"
+          rows="4"
+          placeholder="Ex : Pull M, pantalon 40, pointure 42, chaussettes 39-42, allergique aux noix..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelEditingNotes()">Annuler</button>
+        <button class="btn-save" (click)="saveNotes()">Enregistrer</button>
+      </div>
+    } @else if (memberNotes()) {
+      <p class="comment-text">{{ memberNotes() }}</p>
+    } @else {
+      <p class="no-comments">
+        Pas encore d'infos. Ajoute tes tailles (vêtements, chaussures, chaussettes...) pour aider ceux qui voudraient t'offrir une surprise !
+      </p>
+    }
+  </section>
+
   <div class="filter-container">
     <input
       type="search"

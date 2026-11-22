@@ -40,6 +40,38 @@
   color: var(--color-teal);
 }
 
+/* --- INFOS UTILES DU PROFIL (tailles, pointure...) --- */
+.profile-notes {
+  width: 100%;
+  max-width: 700px;
+  box-sizing: border-box;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 18px;
+  box-shadow: 0 4px 15px rgba(46, 52, 64, 0.06);
+  text-align: left;
+}
+
+.profile-notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.profile-notes-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-teal);
+}
+
+.profile-notes .no-comments {
+  margin: 0;
+}
+
 .trash-item {
   display: flex;
   align-items: center;
@@ -85,6 +117,7 @@
 @media print {
   .header-actions,
   .list-header .btn-save,
+  .profile-notes .btn-icon-text,
   .filter-container,
   .add-gift-card,
   .card-actions,
