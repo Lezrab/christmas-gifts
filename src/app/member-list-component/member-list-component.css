@@ -72,6 +72,20 @@
   margin: 0;
 }
 
+.size-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.size-label {
+  min-width: 130px;
+  font-weight: bold;
+  color: var(--color-ink);
+}
+
 .trash-item {
   display: flex;
   align-items: center;

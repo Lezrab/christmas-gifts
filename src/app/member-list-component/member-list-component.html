@@ -13,26 +13,52 @@
   <section class="profile-notes">
     <div class="profile-notes-header">
       <h2>📏 Infos utiles</h2>
-      @if (!isEditingNotes()) {
-        <button class="btn-icon-text" (click)="startEditingNotes()">
-          {{ memberNotes() ? '✏️ Modifier' : '➕ Ajouter' }}
+      @if (!isEditingInfos()) {
+        <button class="btn-icon-text" (click)="startEditingInfos()">
+          {{ hasInfos() ? '✏️ Modifier' : '➕ Ajouter' }}
         </button>
       }
     </div>
 
-    @if (isEditingNotes()) {
+    @if (isEditingInfos()) {
+      @for (category of sizeCategories; track category.key) {
+        <div class="size-row">
+          <span class="size-label">{{ category.label }}</span>
+          <div class="year-buttons">
+            @for (size of category.options; track size) {
+              <button
+                class="btn-year"
+                [class.active]="isSizeSelected(category.key, size)"
+                (click)="toggleSize(category.key, size)">
+                {{ size }}
+              </button>
+            }
+          </div>
+        </div>
+      }
       <div class="form-group">
+        <label>Précisions</label>
         <textarea
           [(ngModel)]="notesDraft"
-          rows="4"
-          placeholder="Ex : Pull M, pantalon 40, pointure 42, chaussettes 39-42, allergique aux noix..."></textarea>
+          rows="2"
+          placeholder="Ex : coupe ample, pas de laine, allergique aux noix..."></textarea>
       </div>
       <div class="modal-actions">
-        <button class="btn-cancel" (click)="cancelEditingNotes()">Annuler</button>
-        <button class="btn-save" (click)="saveNotes()">Enregistrer</button>
+        <button class="btn-cancel" (click)="cancelEditingInfos()">Annuler</button>
+        <button class="btn-save" (click)="saveInfos()">Enregistrer</button>
       </div>
-    } @else if (memberNotes()) {
-      <p class="comment-text">{{ memberNotes() }}</p>
+    } @else if (hasInfos()) {
+      @for (category of sizeCategories; track category.key) {
+        @if (memberSizes()[category.key]?.length) {
+          <div class="size-row">
+            <span class="size-label">{{ category.label }}</span>
+            <span>{{ memberSizes()[category.key]!.join(', ') }}</span>
+          </div>
+        }
+      }
+      @if (memberNotes()) {
+        <p class="comment-text">{{ memberNotes() }}</p>
+      }
     } @else {
       <p class="no-comments">
         Pas encore d'infos. Ajoute tes tailles (vêtements, chaussures, chaussettes...) pour aider ceux qui voudraient t'offrir une surprise !

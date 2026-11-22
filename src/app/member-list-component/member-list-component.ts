@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
 import { Title } from '@angular/platform-browser';
 import { Toast } from '../services/toast';
+import { MemberSizes, SizeCategory } from '../models/member/member';
 
 @Component({
   selector: 'app-member-list',
@@ -28,9 +29,28 @@ export class MemberListComponent implements OnInit {
   private toastSvc = inject(Toast);
   isUploading = signal(false);
 
-  // Note du profil (tailles, pointure...) affichée en haut de la liste
+  // Infos du profil (tailles + précisions) affichées en haut de la liste
+  readonly sizeCategories: { key: SizeCategory; label: string; options: string[] }[] = [
+    { key: 'haut', label: '👕 Haut', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'] },
+    {
+      key: 'bas',
+      label: '👖 Pantalon',
+      options: ['34', '36', '38', '40', '42', '44', '46', '48', '50'],
+    },
+    {
+      key: 'chaussures',
+      label: '👟 Chaussures',
+      options: Array.from({ length: 14 }, (_, i) => String(35 + i)), // 35 à 48
+    },
+    { key: 'chaussettes', label: '🧦 Chaussettes', options: ['35-38', '39-42', '43-46', '47-50'] },
+  ];
+  memberSizes = signal<MemberSizes>({});
   memberNotes = signal('');
-  isEditingNotes = signal(false);
+  hasInfos = computed(
+    () => !!this.memberNotes() || Object.values(this.memberSizes()).some((s) => s?.length),
+  );
+  isEditingInfos = signal(false);
+  sizesDraft: MemberSizes = {};
   notesDraft = '';
 
   // Fil de commentaires du cadeau affiché dans la modale de détails
@@ -110,6 +130,7 @@ export class MemberListComponent implements OnInit {
       // On récupère le profil pour avoir le nom
       const profile = await this.supabaseSvc.getProfileById(this.memberId);
       this.memberName.set(profile?.name || 'Inconnu');
+      this.memberSizes.set(profile?.sizes ?? {});
       this.memberNotes.set(profile?.notes ?? '');
       this.titleService.setTitle(this.getListTitle(this.memberName()));
 
@@ -126,25 +147,48 @@ export class MemberListComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  startEditingNotes() {
+  startEditingInfos() {
+    this.sizesDraft = structuredClone(this.memberSizes());
     this.notesDraft = this.memberNotes();
-    this.isEditingNotes.set(true);
+    this.isEditingInfos.set(true);
   }
 
-  cancelEditingNotes() {
-    this.isEditingNotes.set(false);
+  cancelEditingInfos() {
+    this.isEditingInfos.set(false);
   }
 
-  async saveNotes() {
+  isSizeSelected(category: SizeCategory, size: string): boolean {
+    return this.sizesDraft[category]?.includes(size) ?? false;
+  }
+
+  toggleSize(category: SizeCategory, size: string) {
+    const current = this.sizesDraft[category] ?? [];
+    const options = this.sizeCategories.find((c) => c.key === category)!.options;
+    const next = current.includes(size) ? current.filter((s) => s !== size) : [...current, size];
+    // On garde l'ordre des options (S, M, L... plutôt que l'ordre de clic)
+    this.sizesDraft[category] = next.sort((a, b) => options.indexOf(a) - options.indexOf(b));
+  }
+
+  async saveInfos() {
     const notes = this.notesDraft.trim();
-    const { error } = await this.supabaseSvc.updateProfile(this.memberId, { notes: notes || null });
+    // On ne stocke pas les catégories vides
+    const sizes: MemberSizes = {};
+    for (const { key } of this.sizeCategories) {
+      if (this.sizesDraft[key]?.length) sizes[key] = this.sizesDraft[key];
+    }
+
+    const { error } = await this.supabaseSvc.updateProfile(this.memberId, {
+      sizes,
+      notes: notes || null,
+    });
     if (error) {
       console.error(error);
       this.toastSvc.show("Erreur lors de l'enregistrement des infos", 'error');
       return;
     }
+    this.memberSizes.set(sizes);
     this.memberNotes.set(notes);
-    this.isEditingNotes.set(false);
+    this.isEditingInfos.set(false);
     this.toastSvc.show('Infos enregistrées');
   }
 

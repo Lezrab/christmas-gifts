@@ -3,6 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 import { Gift } from '../models/gift/gift';
 import { GiftComment } from '../models/gift-comment/gift-comment';
+import { MemberSizes } from '../models/member/member';
 
 @Injectable({
   providedIn: 'root',
@@ -67,7 +68,13 @@ export class Supabase {
 
   async updateProfile(
     id: string,
-    updates: { name?: string; mail?: string; avatar_url?: string; notes?: string | null },
+    updates: {
+      name?: string;
+      mail?: string;
+      avatar_url?: string;
+      sizes?: MemberSizes | null;
+      notes?: string | null;
+    },
   ) {
     const { data, error } = await this.supabase
       .from('profiles')
